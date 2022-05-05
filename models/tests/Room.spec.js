@@ -9,17 +9,37 @@ describe("room test", () => {
 		});
 
 		testRoom.validate((err) => {
-			expect(err.errors["generalInfo.residenceType"]).to.not.exist;
-			expect(err.errors["generalInfo.session"]).to.exist;
+			expect(err.errors["generalInfo"]).to.exist;
 
-			expect(err.errors["roomInfo.room"]).to.exist;
-			expect(err.errors["roomInfo.floor"]).to.exist;
-			expect(err.errors["roomInfo.washroom"]).to.exist;
-			expect(err.errors["roomInfo.building"]).to.exist;
+			expect(err.errors["roomInfo"]).to.exist;
 
-			expect(err.errors["eligibilityInfo.minimumAge"]).to.not.exist;
-			expect(err.errors["eligibilityInfo.allowedGender"]).to.exist;
+			expect(err.errors["eligibilityInfo"]).to.exist;
 
+			done();
+		});
+	});
+
+	it("throws no error for all valid fields", (done) => {
+		var testRoom = new Room({
+			residenceArea: "Orchard Commons",
+			generalInfo: {
+				session: "Winter Session",
+			},
+			roomInfo: {
+				room: "Connected Single Room",
+				floor: 14,
+				washroom: "Private",
+				building: "Braeburn House",
+			},
+			eligibilityInfo: {
+				allowedGender: "Male",
+			},
+		});
+
+		testRoom.validate((err) => {
+			console.log(err);
+
+			expect(err).to.be.null;
 			done();
 		});
 	});

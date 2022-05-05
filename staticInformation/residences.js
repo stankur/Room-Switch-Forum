@@ -310,9 +310,19 @@ var getMinimumAgeOf = (residenceName) => {
 	return getPropertyofResidenceWithName(residenceName, "minimumAge");
 };
 
+var getAllBuildings = () => {
+	var allBuildings = [];
+
+	residences.forEach((residence) => {
+		allBuildings = allBuildings.concat(residence.buildings);
+	});
+	return allBuildings;
+};
+
 module.exports = {
 	residences,
 	getResidenceNames,
+	getAllBuildings,
 	getTypeOf,
 	getSessionsOf,
 	getRoomsOf,

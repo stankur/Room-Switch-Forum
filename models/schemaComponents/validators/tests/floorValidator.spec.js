@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-var floorValidator = require("../floorValidator");
+var floorValidator = require("../floorValidator").floorValidator;
 
 describe("floor validator test", () => {
 	it("rejects nonpositive numbers", () => {

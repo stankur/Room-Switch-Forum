@@ -6,22 +6,23 @@ var isArrayOfLengthTwo = function (value) {
 	return Array.isArray(value) && value.length === 2;
 };
 
-var isIncreasing = function (value) {
+var isNonDecreasing = function (value) {
 	var first = value[0];
 	var second = value[1];
 
 	return (
 		isPositiveInteger(first) &&
 		(isPositiveInteger(second) || second === Infinity) &&
-		second > first
+		second >= first
 	);
+};
+
+var isValidPositiveRange = function (value) {
+	return isArrayOfLengthTwo(value) && isNonDecreasing(value);
 };
 
 var floorValidator = function (value) {
-	return (
-		isPositiveInteger(value) ||
-		(isArrayOfLengthTwo(value) && isIncreasing(value))
-	);
+	return isPositiveInteger(value) || isValidPositiveRange(value);
 };
 
-module.exports = floorValidator;
+module.exports = { floorValidator, isValidPositiveRange, isPositiveInteger };
