@@ -64,4 +64,26 @@ describe("residences test", () => {
 
 		done();
 	});
+
+	it("could get all residence names", () => {
+		expect(residences.getResidenceNames()).to.eql([
+			"Orchard Commons",
+			"Place Vanier",
+			"Totem Park",
+			"Brock Commons – Tallwood House",
+			"Exchange",
+			"Fairview Crescent",
+			"Fraser Hall",
+			"Iona House",
+			"Marine Drive",
+			"Ponderosa Commons",
+			"Ritsumeikan-UBC House",
+			"tə šxʷhəleləm̓s tə k̓ʷaƛ̓kʷəʔaʔɬ",
+			"Thunderbird",
+			"Walter Gage",
+			"Acadia Park",
+			"Green College",
+			"St. John's College",
+		]);
+	});
 });

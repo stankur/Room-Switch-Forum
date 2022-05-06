@@ -1,23 +1,27 @@
-var residencesModule = require("../staticInformation/residences");
-var Room = require("./Room");
 var Preference = require("./embeddedDocuments/Preference");
 
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
+var numberOfPeopleValidator = function (value) {
+	return value === 1 || value === 2;
+};
+
 var quantityValidator = function (value) {
 	return 1 <= value && value <= this.numberOfPeople;
+};
+
+var roomsLengthValidator = function (rooms) {
+	return quantityValidator.bind(this)(rooms.length);
 };
 
 var OfferSchema = new Schema({
 	numberOfPeople: {
 		type: Number,
 		validate: {
-			validator: function (value) {
-				return value === 1 || value === 2;
-			},
+			validator: numberOfPeopleValidator,
 		},
-		required: true,
+		default: 1,
 	},
 	roomsWanted: {
 		type: Number,
@@ -26,28 +30,25 @@ var OfferSchema = new Schema({
 		},
 		default: 1,
 	},
-	rooms: [
-		{
-			type: [
-				{
-					type: Schema.Types.ObjectId,
-					ref: "Room",
-				},
-			],
-			validate: {
-				validator: function (arrayOfRooms) {
-					return quantityValidator(arrayOfRooms.length);
-				},
+	rooms: {
+		type: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Room",
 			},
-			required: true,
+		],
+		validate: {
+			validator: roomsLengthValidator,
 		},
-	],
+		required: true,
+	},
+
 	preference: {
 		type: [Preference],
 		validate: function (arrayOfPreferences) {
-			return arrayOfPreferences >= 0;
+			return arrayOfPreferences.length >= 1;
 		},
-		default: [{}],
+		default: () => [{}],
 	},
 });
 
