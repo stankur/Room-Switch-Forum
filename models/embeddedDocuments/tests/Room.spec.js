@@ -1,6 +1,7 @@
 const { expect } = require("chai");
+var mongoose = require("mongoose");
 
-var Room = require("../Room");
+var Room = mongoose.model("Room", require("../Room"));
 
 describe("room test", () => {
 	it("invalidates missing required fields", (done) => {

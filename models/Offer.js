@@ -1,6 +1,7 @@
 var Preference = require("./embeddedDocuments/Preference");
 
 var mongoose = require("mongoose");
+const Room = require("./embeddedDocuments/Room");
 var Schema = mongoose.Schema;
 
 var numberOfPeopleValidator = function (value) {
@@ -31,24 +32,22 @@ var OfferSchema = new Schema({
 		default: 1,
 	},
 	rooms: {
-		type: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: "Room",
-			},
-		],
+		type: [Room],
 		validate: {
 			validator: roomsLengthValidator,
 		},
 		required: true,
 	},
-
 	preference: {
 		type: [Preference],
 		validate: function (arrayOfPreferences) {
 			return arrayOfPreferences.length >= 1;
 		},
 		default: () => [{}],
+	},
+	dateCreated: {
+		type: Date,
+		default: Date.now(),
 	},
 });
 

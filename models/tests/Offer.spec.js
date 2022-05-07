@@ -12,6 +12,7 @@ describe("Offer test", () => {
 			expect(err.errors["numberOfPeople"]).to.not.exist;
 			expect(err.errors["roomsWanted"]).to.not.exist;
 			expect(err.errors["preference"]).to.not.exist;
+			expect(err.errors["dateCreated"]).to.not.exist;
 
 			done();
 		});
@@ -21,8 +22,36 @@ describe("Offer test", () => {
 		var testOffer = new Offer({
 			numberOfPeople: 3,
 			rooms: [
-				new mongoose.Types.ObjectId(),
-				new mongoose.Types.ObjectId(),
+				{
+					residenceArea: "Orchard Commons",
+					generalInfo: {
+						session: "Winter Session",
+					},
+					roomInfo: {
+						room: "Connected Single Room",
+						floor: 14,
+						washroom: "Private",
+						building: "Braeburn House",
+					},
+					eligibilityInfo: {
+						allowedGender: "Male",
+					},
+				},
+				{
+					residenceArea: "Orchard Commons",
+					generalInfo: {
+						session: "Winter Session",
+					},
+					roomInfo: {
+						room: "Connected Single Room",
+						floor: 15,
+						washroom: "Private",
+						building: "Braeburn House",
+					},
+					eligibilityInfo: {
+						allowedGender: "Male",
+					},
+				},
 			],
 		});
 
@@ -31,6 +60,7 @@ describe("Offer test", () => {
 			expect(err.errors["rooms"]).to.not.exist;
 			expect(err.errors["roomsWanted"]).to.not.exist;
 			expect(err.errors["preference"]).to.not.exist;
+			expect(err.errors["dateCreated"]).to.not.exist;
 
 			done();
 		});
@@ -40,7 +70,23 @@ describe("Offer test", () => {
 		var testOffer = new Offer({
 			numberOfPeople: 1,
 			roomsWanted: 2,
-			rooms: [new mongoose.Types.ObjectId()],
+			rooms: [
+				{
+					residenceArea: "Orchard Commons",
+					generalInfo: {
+						session: "Winter Session",
+					},
+					roomInfo: {
+						room: "Connected Single Room",
+						floor: 14,
+						washroom: "Private",
+						building: "Braeburn House",
+					},
+					eligibilityInfo: {
+						allowedGender: "Male",
+					},
+				},
+			],
 		});
 
 		testOffer.validate((err) => {
@@ -48,6 +94,7 @@ describe("Offer test", () => {
 			expect(err.errors["rooms"]).to.not.exist;
 			expect(err.errors["roomsWanted"]).to.exist;
 			expect(err.errors["preference"]).to.not.exist;
+			expect(err.errors["dateCreated"]).to.not.exist;
 
 			next1();
 		});
@@ -56,7 +103,23 @@ describe("Offer test", () => {
 			testOffer = new Offer({
 				numberOfPeople: 1,
 				roomsWanted: 1,
-				rooms: [new mongoose.Types.ObjectId()],
+				rooms: [
+					{
+						residenceArea: "Orchard Commons",
+						generalInfo: {
+							session: "Winter Session",
+						},
+						roomInfo: {
+							room: "Connected Single Room",
+							floor: 14,
+							washroom: "Private",
+							building: "Braeburn House",
+						},
+						eligibilityInfo: {
+							allowedGender: "Male",
+						},
+					},
+				],
 			});
 
 			testOffer.validate((err) => {
@@ -64,6 +127,7 @@ describe("Offer test", () => {
 				expect(err.errors["rooms"]).to.not.exist;
 				expect(err.errors["roomsWanted"]).to.not.exist;
 				expect(err.errors["preference"]).to.not.exist;
+				expect(err.errors["dateCreated"]).to.not.exist;
 
 				next2();
 			});
@@ -73,7 +137,23 @@ describe("Offer test", () => {
 			testOffer = new Offer({
 				numberOfPeople: 2,
 				roomsWanted: 1,
-				rooms: [new mongoose.Types.ObjectId()],
+				rooms: [
+					{
+						residenceArea: "Orchard Commons",
+						generalInfo: {
+							session: "Winter Session",
+						},
+						roomInfo: {
+							room: "Connected Single Room",
+							floor: 14,
+							washroom: "Private",
+							building: "Braeburn House",
+						},
+						eligibilityInfo: {
+							allowedGender: "Male",
+						},
+					},
+				],
 			});
 
 			testOffer.validate((err) => {
@@ -81,6 +161,7 @@ describe("Offer test", () => {
 				expect(err.errors["rooms"]).to.not.exist;
 				expect(err.errors["roomsWanted"]).to.not.exist;
 				expect(err.errors["preference"]).to.not.exist;
+				expect(err.errors["dateCreated"]).to.not.exist;
 
 				next3();
 			});
@@ -90,7 +171,23 @@ describe("Offer test", () => {
 			testOffer = new Offer({
 				numberOfPeople: 2,
 				roomsWanted: 2,
-				rooms: [new mongoose.Types.ObjectId()],
+				rooms: [
+					{
+						residenceArea: "Orchard Commons",
+						generalInfo: {
+							session: "Winter Session",
+						},
+						roomInfo: {
+							room: "Connected Single Room",
+							floor: 14,
+							washroom: "Private",
+							building: "Braeburn House",
+						},
+						eligibilityInfo: {
+							allowedGender: "Male",
+						},
+					},
+				],
 			});
 
 			testOffer.validate((err) => {
@@ -98,6 +195,7 @@ describe("Offer test", () => {
 				expect(err.errors["rooms"]).to.not.exist;
 				expect(err.errors["roomsWanted"]).to.not.exist;
 				expect(err.errors["preference"]).to.not.exist;
+				expect(err.errors["dateCreated"]).to.not.exist;
 
 				next4();
 			});
@@ -107,7 +205,23 @@ describe("Offer test", () => {
 			testOffer = new Offer({
 				numberOfPeople: 2,
 				roomsWanted: 3,
-				rooms: [new mongoose.Types.ObjectId()],
+				rooms: [
+					{
+						residenceArea: "Orchard Commons",
+						generalInfo: {
+							session: "Winter Session",
+						},
+						roomInfo: {
+							room: "Connected Single Room",
+							floor: 14,
+							washroom: "Private",
+							building: "Braeburn House",
+						},
+						eligibilityInfo: {
+							allowedGender: "Male",
+						},
+					},
+				],
 			});
 
 			testOffer.validate((err) => {
@@ -115,6 +229,7 @@ describe("Offer test", () => {
 				expect(err.errors["rooms"]).to.not.exist;
 				expect(err.errors["roomsWanted"]).to.exist;
 				expect(err.errors["preference"]).to.not.exist;
+				expect(err.errors["dateCreated"]).to.not.exist;
 
 				done();
 			});
