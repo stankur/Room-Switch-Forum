@@ -268,7 +268,22 @@ describe("schema builder test", () => {
 
 		var expected = new Schema({
 			rooms: {
-				type: [testSchema],
+				type: [
+					{
+						type: String,
+						validate: {
+							validator: function (value) {
+								return [
+									"Orchard Commons",
+									"Place Vanier",
+									"totem park",
+									"Marine Drive",
+								].includes(value);
+							},
+						},
+						required: true,
+					},
+				],
 				validate: {
 					validator: function (value) {
 						return value.length >= 1;

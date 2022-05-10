@@ -5,15 +5,22 @@ var createPreferenceArraySchema = function (baseShema, allPossibilites) {
 	var validatedBase = schemaBuilder
 		.modifyBaseSchema(baseShema)
 		.validateWith(function (value) {
-			return arrayOrBaseValidator.isSubsetOfCollection(
-				value,
-				allPossibilites
-			);
+			return allPossibilites.includes(value);
 		});
 
 	var arrayOfBase = schemaBuilder
 		.modifyBaseSchema(validatedBase)
-		.ceateArraySchema(arrayOrBaseValidator.noDuplicateAndNotEmptyValidator);
+		.ceateArraySchema(function (arrayOfBase) {
+			return (
+				arrayOrBaseValidator.noDuplicateAndNotEmptyValidator(
+					arrayOfBase
+				) &&
+				arrayOrBaseValidator.isSubsetOfCollection(
+					arrayOfBase,
+					allPossibilites
+				)
+			);
+		});
 
 	var setDefaultArrayOfBase = schemaBuilder
 		.modifyBaseSchema(arrayOfBase)

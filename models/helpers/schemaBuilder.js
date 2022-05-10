@@ -58,7 +58,7 @@ var modifyBaseSchema = (baseSchema) => {
 		if (arrayValidator === null) {
 			return new Schema({
 				[propertyName + "s"]: {
-					type: [baseSchema],
+					type: [baseSchema.obj[propertyName]],
 					required: required ? true : false,
 				},
 			});
@@ -66,7 +66,7 @@ var modifyBaseSchema = (baseSchema) => {
 
 		return new Schema({
 			[propertyName + "s"]: {
-				type: [baseSchema],
+				type: [baseSchema.obj[propertyName]],
 				validate: {
 					validator: arrayValidator,
 				},

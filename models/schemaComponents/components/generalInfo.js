@@ -21,9 +21,7 @@ var residenceType = (() => {
 	var setDefaultResidenceType = schemaBuilder
 		.modifyBaseSchema(baseResidenceType)
 		.setDefault(function () {
-			return residencesModule.getTypeOf(
-				this.ownerDocument().residenceArea
-			);
+			return residencesModule.getTypeOf(this.parent().residenceArea);
 		});
 
 	var validatedResidenceType = schemaBuilder
@@ -31,7 +29,7 @@ var residenceType = (() => {
 		.validateWith(function (value) {
 			return (
 				value ===
-				residencesModule.getTypeOf(this.ownerDocument().residenceArea)
+				residencesModule.getTypeOf(this.parent().residenceArea)
 			);
 		});
 
@@ -55,7 +53,7 @@ var session = (() => {
 		.validateWith(function (value) {
 			return accomodationValidator(
 				"sessions",
-				this.ownerDocument().residenceArea
+				this.parent().residenceArea
 			)(value);
 		});
 

@@ -21,9 +21,7 @@ var minimumAge = (() => {
 		.validateWith(function (value) {
 			return (
 				value ===
-				residencesModule.getMinimumAgeOf(
-					this.ownerDocument().residenceArea
-				)
+				residencesModule.getMinimumAgeOf(this.parent().residenceArea)
 			);
 		});
 
@@ -31,7 +29,7 @@ var minimumAge = (() => {
 		.modifyBaseSchema(validatedMinimumAge)
 		.setDefault(function () {
 			return residencesModule.getMinimumAgeOf(
-				this.ownerDocument().residenceArea
+				this.parent().residenceArea
 			);
 		});
 

@@ -86,4 +86,11 @@ describe("residences test", () => {
 			"St. John's College",
 		]);
 	});
+
+	it("could get all sessions of a certain residence Area", () => {
+		expect(residences.getSessionsOf("Orchard Commons")).to.eql([
+			"Winter Session",
+		]);
+		expect(residences.getSessionsOf("Thunderbird")).to.eql(["Year Round"]);
+	});
 });

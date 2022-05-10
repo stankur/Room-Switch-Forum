@@ -1,5 +1,5 @@
 var noDuplicateAndNotEmptyValidator = function (array) {
-	var noDuplicate = new Set(array).length === array.length;
+	var noDuplicate = new Set(array).size === array.length;
 	var notEmpty = array.length >= 1;
 
 	return noDuplicate && notEmpty;

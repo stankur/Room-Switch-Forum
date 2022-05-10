@@ -3,16 +3,32 @@ const { expect } = require("chai");
 var Offer = require("../Offer");
 var mongoose = require("mongoose");
 
+var errorExist = (startWord, errors, isExact) => {
+	if (!errors) {
+		return false;
+	}
+	return Object.keys(errors).some((errorKey) => {
+		if (isExact) {
+			return Boolean(
+				new RegExp(
+					"(^" + startWord + "$)|(^" + startWord + "\\.)"
+				).exec(errorKey)
+			);
+		}
+		return Boolean(new RegExp("^" + startWord).exec(errorKey));
+	});
+};
+
 describe("Offer test", () => {
 	it("invalidates document with missing field", (done) => {
 		var testOffer = new Offer({});
 
 		testOffer.validate((err) => {
-			expect(err.errors["rooms"]).to.exist;
-			expect(err.errors["numberOfPeople"]).to.not.exist;
-			expect(err.errors["roomsWanted"]).to.not.exist;
-			expect(err.errors["preference"]).to.not.exist;
-			expect(err.errors["dateCreated"]).to.not.exist;
+			expect(errorExist("rooms", err.errors, true)).to.be.true;
+			expect(errorExist("numberOfPeople", err.errors)).to.be.false;
+			expect(errorExist("roomsWanted", err.errors)).to.be.false;
+			expect(errorExist("preference", err.errors)).to.be.false;
+			expect(errorExist("dateCreated", err.errors)).to.be.false;
 
 			done();
 		});
@@ -56,11 +72,11 @@ describe("Offer test", () => {
 		});
 
 		testOffer.validate((err) => {
-			expect(err.errors["numberOfPeople"]).to.exist;
-			expect(err.errors["rooms"]).to.not.exist;
-			expect(err.errors["roomsWanted"]).to.not.exist;
-			expect(err.errors["preference"]).to.not.exist;
-			expect(err.errors["dateCreated"]).to.not.exist;
+			expect(errorExist("numberOfPeople", err.errors)).to.be.true;
+			expect(errorExist("rooms", err.errors, true)).to.be.false;
+			expect(errorExist("roomsWanted", err.errors)).to.be.false;
+			expect(errorExist("preference", err.errors)).to.be.false;
+			expect(errorExist("dateCreated", err.errors)).to.be.false;
 
 			done();
 		});
@@ -90,12 +106,11 @@ describe("Offer test", () => {
 		});
 
 		testOffer.validate((err) => {
-			expect(err.errors["numberOfPeople"]).to.not.exist;
-			expect(err.errors["rooms"]).to.not.exist;
-			expect(err.errors["roomsWanted"]).to.exist;
-			expect(err.errors["preference"]).to.not.exist;
-			expect(err.errors["dateCreated"]).to.not.exist;
-
+			expect(errorExist("numberOfPeople", err.errors)).to.be.false;
+			expect(errorExist("rooms", err.errors, true)).to.be.false;
+			expect(errorExist("roomsWanted", err.errors)).to.be.true;
+			expect(errorExist("preference", err.errors)).to.be.false;
+			expect(errorExist("dateCreated", err.errors)).to.be.false;
 			next1();
 		});
 
@@ -123,11 +138,7 @@ describe("Offer test", () => {
 			});
 
 			testOffer.validate((err) => {
-				expect(err.errors["numberOfPeople"]).to.not.exist;
-				expect(err.errors["rooms"]).to.not.exist;
-				expect(err.errors["roomsWanted"]).to.not.exist;
-				expect(err.errors["preference"]).to.not.exist;
-				expect(err.errors["dateCreated"]).to.not.exist;
+				expect(err).to.not.be.ok;
 
 				next2();
 			});
@@ -157,11 +168,7 @@ describe("Offer test", () => {
 			});
 
 			testOffer.validate((err) => {
-				expect(err.errors["numberOfPeople"]).to.not.exist;
-				expect(err.errors["rooms"]).to.not.exist;
-				expect(err.errors["roomsWanted"]).to.not.exist;
-				expect(err.errors["preference"]).to.not.exist;
-				expect(err.errors["dateCreated"]).to.not.exist;
+				expect(err).to.not.be.ok;
 
 				next3();
 			});
@@ -191,11 +198,7 @@ describe("Offer test", () => {
 			});
 
 			testOffer.validate((err) => {
-				expect(err.errors["numberOfPeople"]).to.not.exist;
-				expect(err.errors["rooms"]).to.not.exist;
-				expect(err.errors["roomsWanted"]).to.not.exist;
-				expect(err.errors["preference"]).to.not.exist;
-				expect(err.errors["dateCreated"]).to.not.exist;
+				expect(err).to.not.be.ok;
 
 				next4();
 			});
@@ -225,14 +228,48 @@ describe("Offer test", () => {
 			});
 
 			testOffer.validate((err) => {
-				expect(err.errors["numberOfPeople"]).to.not.exist;
-				expect(err.errors["rooms"]).to.not.exist;
-				expect(err.errors["roomsWanted"]).to.exist;
-				expect(err.errors["preference"]).to.not.exist;
-				expect(err.errors["dateCreated"]).to.not.exist;
+				expect(errorExist("numberOfPeople", err.errors)).to.be.false;
+				expect(errorExist("rooms", err.errors, true)).to.be.false;
+				expect(errorExist("roomsWanted", err.errors)).to.be.true;
+				expect(errorExist("preference", err.errors)).to.be.false;
+				expect(errorExist("dateCreated", err.errors)).to.be.false;
 
 				done();
 			});
 		};
+	});
+
+	it("accepts valid preference", (done) => {
+		var testOffer = new Offer({
+			numberOfPeople: 2,
+			roomsWanted: 2,
+			rooms: [
+				{
+					residenceArea: "Orchard Commons",
+					generalInfo: {
+						session: "Winter Session",
+					},
+					roomInfo: {
+						room: "Connected Single Room",
+						floor: 14,
+						washroom: "Private",
+						building: "Braeburn House",
+					},
+					eligibilityInfo: {
+						allowedGender: "Male",
+					},
+				},
+			],
+			preference: [
+				{
+					residenceAreas: ["Orchard Commons"],
+				},
+			],
+		});
+
+		testOffer.validate((err) => {
+			expect(err).to.not.be.ok;
+			done();
+		});
 	});
 });

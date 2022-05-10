@@ -25,7 +25,7 @@ var room = (() => {
 		.validateWith(function (value) {
 			return accomodationValidator(
 				"rooms",
-				this.ownerDocument().residenceArea
+				this.parent().residenceArea
 			)(value);
 		});
 
@@ -102,13 +102,18 @@ var building = (() => {
 		.validateWith(function (value) {
 			return accomodationValidator(
 				"buildings",
-				this.ownerDocument().residenceArea
+				this.parent().residenceArea
 			)(value);
 		});
 
 	var setRequiredBuilding = schemaBuilder
 		.modifyBaseSchema(validatedBuilding)
-		.setRequired(true);
+		.setRequired(function () {
+			return (
+				residencesModule.getBuildingsOf(this.parent().residenceArea)
+					.length > 0
+			);
+		});
 
 	return setRequiredBuilding;
 })();
