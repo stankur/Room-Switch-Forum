@@ -57,7 +57,7 @@ var modifyBaseSchema = (baseSchema) => {
 		}
 		if (arrayValidator === null) {
 			return new Schema({
-				[propertyName + "s"]: {
+				[propertyName]: {
 					type: [baseSchema.obj[propertyName]],
 					required: required ? true : false,
 				},
@@ -65,10 +65,64 @@ var modifyBaseSchema = (baseSchema) => {
 		}
 
 		return new Schema({
-			[propertyName + "s"]: {
+			[propertyName]: {
 				type: [baseSchema.obj[propertyName]],
 				validate: {
 					validator: arrayValidator,
+				},
+				required: required ? true : false,
+			},
+		});
+	};
+
+	var createIntervalSchema = (intervalValidator, required) => {
+		if (intervalValidator === undefined) {
+			throw new console.error(
+				"must pass in intervalValidator! If you don't want validator, pass in null"
+			);
+		}
+
+		if (intervalValidator === null) {
+			return new Schema({
+				[propertyName]: {
+					type: {
+						spec: {
+							type: String,
+							validator: {
+								validate: function (value) {
+									return value === "Interval";
+								},
+							},
+							default: "Interval",
+						},
+
+						criteria: {},
+					},
+					required: required ? true : false,
+				},
+			});
+		}
+
+		return new Schema({
+			[propertyName]: {
+				type: {
+					spec: {
+						type: String,
+						validator: {
+							validate: function (value) {
+								return value === "Interval";
+							},
+						},
+						default: "Interval",
+					},
+
+					criteria: {
+						type: [Number],
+						validator: {
+							validate: intervalValidator,
+						},
+						default: [1, Number.MAX_SAFE_INTEGER],
+					},
 				},
 				required: required ? true : false,
 			},
@@ -81,6 +135,7 @@ var modifyBaseSchema = (baseSchema) => {
 		setDefault,
 		setRequired,
 		ceateArraySchema,
+		createIntervalSchema,
 	};
 };
 

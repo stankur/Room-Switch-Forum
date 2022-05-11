@@ -21,7 +21,7 @@ var createResidence = (name, type, sessions, rooms, buildings, minimumAge) => {
 	});
 
 	if (minimumAge === undefined) {
-		minimumAge = 0;
+		minimumAge = 1;
 	}
 
 	if (!minimumAges.includes(minimumAge)) {

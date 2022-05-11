@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var schemaBuilder = require("../../helpers/schemaBuilder");
 
-var createPreferenceSchema = require("../helper");
+var createPreferenceSchema = require("../helper").createPreferenceArraySchema;
 
 var allResidenceAreas =
 	require("../../../staticInformation/residences").getResidenceNames();

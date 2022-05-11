@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var schemaBuilder = require("../../helpers/schemaBuilder");
-var createPreferenceSchema = require("../helper");
+var createPreferenceSchema = require("../helper").createPreferenceArraySchema;
 
 var residencesModule = require("../../../staticInformation/residences");
 

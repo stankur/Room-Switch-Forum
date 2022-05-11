@@ -151,7 +151,7 @@ describe("room test", () => {
 			},
 			eligibilityInfo: {
 				allowedGender: "Male",
-				minimumAge: 0,
+				minimumAge: 1,
 			},
 		});
 

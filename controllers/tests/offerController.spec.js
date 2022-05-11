@@ -12,7 +12,22 @@ const app = express();
 const { expect } = require("chai");
 
 app.use(express.urlencoded({ extended: false }));
-app.get("/", offerController.getOffer);
+app.get("/", offerController.getOffers);
+app.get("/:id/matches", offerController.getMatches);
+
+var expectDataToEqual = (data, exepcted) => {
+	expect(data.length).to.equal(exepcted.length);
+
+	var ids = data.map((datum) => {
+		return datum["_id"];
+	});
+
+	var expectedIds = exepcted.map((datum) => {
+		return datum.id;
+	});
+
+	expect(ids).to.eql(expectedIds);
+};
 
 describe("offer controller test", () => {
 	var testOffer1;
@@ -89,6 +104,22 @@ describe("offer controller test", () => {
 					},
 					eligibilityInfo: {
 						allowedGender: "Male",
+					},
+				},
+			],
+			preference: [
+				{
+					residenceArea: [
+						"Orchard Commons",
+						"Totem Park",
+						"Exchange",
+						"Fraser Hall",
+					],
+					roomInfo: {
+						floor: {
+							spec: "Interval",
+							criteria: [1, 9],
+						},
 					},
 				},
 			],
@@ -255,28 +286,18 @@ describe("offer controller test", () => {
 						done(new Error(err));
 					} else {
 						var data = JSON.parse(response["text"]);
-						expect(data.length).to.equal(9);
-
-						var ids = data.map((offer) => {
-							return offer["_id"];
-						});
-
-						var expectedIds = allOffers.map((offer) => {
-							return offer.id;
-						});
-
-						expect(ids).to.eql(expectedIds);
+						expectDataToEqual(data, allOffers);
 						done();
 					}
 				});
 		});
 
 		describe("filter test", () => {
-			it("could perform one includes type of filter", (done) => {
+			it("could perform one includes spec of filter", (done) => {
 				request(app)
 					.get("/")
 					.query({
-						filter: '{"rooms" : { "type" : "Includes", "criteria": { "residenceArea" : ["Orchard Commons", "Exchange"]}}}',
+						filter: '{"rooms" : { "spec" : "Includes", "criteria": { "residenceArea" : ["Orchard Commons", "Exchange"]}}}',
 					})
 					.expect("Content-Type", /json/)
 					.expect(200)
@@ -285,30 +306,17 @@ describe("offer controller test", () => {
 							done(new Error(err));
 						} else {
 							var data = JSON.parse(response["text"]);
-							console.log(data);
-							expect(data.length).to.equal(2);
-
-							var ids = data.map((offer) => {
-								return offer["_id"];
-							});
-
-							var expectedIds = [testOffer1, testOffer4].map(
-								(offer) => {
-									return offer.id;
-								}
-							);
-
-							expect(ids).to.eql(expectedIds);
+							expectDataToEqual(data, [testOffer1, testOffer4]);
 							done();
 						}
 					});
 			});
 
-			it("could perform one interval type of filter", (done) => {
+			it("could perform one interval spec of filter", (done) => {
 				request(app)
 					.get("/")
 					.query({
-						filter: '{"numberOfPeople": { "type": "Interval", "criteria" : [2, "Infinity"] }}',
+						filter: '{"numberOfPeople": { "spec": "Interval", "criteria" : [2, "Infinity"] }}',
 					})
 					.expect("Content-Type", /json/)
 					.expect(200)
@@ -317,23 +325,13 @@ describe("offer controller test", () => {
 							done(new Error(err));
 						} else {
 							var data = JSON.parse(response["text"]);
-							console.log(data);
-							expect(data.length).to.equal(4);
-
-							var ids = data.map((offer) => {
-								return offer["_id"];
-							});
-
-							var expectedIds = [
+							expectDataToEqual(data, [
 								testOffer3,
 								testOffer5,
 								testOffer7,
 								testOffer9,
-							].map((offer) => {
-								return offer.id;
-							});
+							]);
 
-							expect(ids).to.eql(expectedIds);
 							next();
 						}
 					});
@@ -342,7 +340,7 @@ describe("offer controller test", () => {
 					request(app)
 						.get("/")
 						.query({
-							filter: '{"numberOfPeople" : { "type": "Interval", "criteria" : [1, 1] }}',
+							filter: '{"numberOfPeople" : { "spec": "Interval", "criteria" : [1, 1] }}',
 						})
 						.expect("Content-Type", /json/)
 						.expect(200)
@@ -351,31 +349,21 @@ describe("offer controller test", () => {
 								done(new Error(err));
 							} else {
 								var data = JSON.parse(response["text"]);
-								console.log(data);
-								expect(data.length).to.equal(5);
-
-								var ids = data.map((offer) => {
-									return offer["_id"];
-								});
-
-								var expectedIds = [
+								expectDataToEqual(data, [
 									testOffer1,
 									testOffer2,
 									testOffer4,
 									testOffer6,
 									testOffer8,
-								].map((offer) => {
-									return offer.id;
-								});
+								]);
 
-								expect(ids).to.eql(expectedIds);
 								done();
 							}
 						});
 				};
 			});
 
-			it("could perform normal type of filter (the filter of acceptable values)", (done) => {
+			it("could perform normal spec of filter (the filter of acceptable values)", (done) => {
 				request(app)
 					.get("/")
 					.query({
@@ -388,28 +376,17 @@ describe("offer controller test", () => {
 							done(err);
 						} else {
 							var data = JSON.parse(response["text"]);
-							console.log(data);
-							expect(data.length).to.equal(1);
-
-							var ids = data.map((offer) => {
-								return offer["_id"];
-							});
-
-							var expectedIds = [testOffer3].map((offer) => {
-								return offer.id;
-							});
-
-							expect(ids).to.eql(expectedIds);
+							expectDataToEqual(data, [testOffer3]);
 							done();
 						}
 					});
 			});
 
-			it("could perform combiated filters", (done) => {
+			it("could perform combined filters", (done) => {
 				request(app)
 					.get("/")
 					.query({
-						filter: '{ "numberOfPeople": 1, "rooms": {"type": "Includes", "criteria": {"roomInfo": {"washroom": "Private", "floor": {"type" : "Interval", "criteria" : [1, 5]}}}}}',
+						filter: '{ "numberOfPeople": 1, "rooms": {"spec": "Includes", "criteria": {"roomInfo": {"washroom": "Private", "floor": {"spec" : "Interval", "criteria" : [1, 5]}}}}}',
 					})
 					.expect("Content-Type", /json/)
 					.expect(200)
@@ -418,25 +395,61 @@ describe("offer controller test", () => {
 							done(err);
 						} else {
 							var data = JSON.parse(response["text"]);
-							expect(data.length).to.equal(3);
-
-							var ids = data.map((offer) => {
-								return offer["_id"];
-							});
-
-							var expectedIds = [
+							expectDataToEqual(data, [
 								testOffer2,
 								testOffer6,
 								testOffer8,
-							].map((offer) => {
-								return offer.id;
-							});
-
-							expect(ids).to.eql(expectedIds);
+							]);
 							done();
 						}
 					});
 			});
+		});
+	});
+
+	describe("get matches test", () => {
+		it("could get all offers of default preference", (done) => {
+			console.log("id given: " + testOffer1.id);
+			request(app)
+				.get("/" + testOffer1.id + "/matches")
+				.expect("Content-Type", /json/)
+				.expect(200)
+				.end((err, response) => {
+					if (err) {
+						done(err);
+					} else {
+						var data = JSON.parse(response["text"]);
+
+						expectDataToEqual(data, [
+							testOffer2,
+							testOffer3,
+							testOffer4,
+							testOffer5,
+							testOffer6,
+							testOffer7,
+							testOffer8,
+							testOffer9,
+						]);
+						done();
+					}
+				});
+		});
+
+		it("could get offers matching custom preference", (done) => {
+			console.log("id given: " + testOffer3.id);
+			request(app)
+				.get("/" + testOffer3.id + "/matches")
+				.expect("Content-Type", /json/)
+				.expect(200)
+				.end((err, response) => {
+					if (err) {
+						done(err);
+					} else {
+						var data = JSON.parse(response["text"]);
+						expectDataToEqual(data, [testOffer5]);
+						done();
+					}
+				});
 		});
 	});
 });

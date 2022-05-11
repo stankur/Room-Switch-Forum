@@ -2,7 +2,8 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var schemaBuilder = require("../../helpers/schemaBuilder");
-var createPreferenceSchema = require("../helper");
+var createPreferenceSchema = require("../helper").createPreferenceArraySchema;
+var createIntervalSchema = require("../helper").createIntervalSchema;
 
 var residencesModule = require("../../../staticInformation/residences");
 
@@ -11,7 +12,7 @@ var allGenders = require("../../../staticInformation/allowedGenders");
 
 var baseMinimumAge = new Schema({
 	minimumAge: {
-		type: Number,
+		type: Schema.Types.Mixed,
 	},
 });
 
@@ -36,7 +37,7 @@ var minimumAge = (() => {
 	return setDefaultMinimumAge;
 })();
 
-var minimumAges = createPreferenceSchema(baseMinimumAge, allMinimumAges);
+var minimumAges = createIntervalSchema(baseMinimumAge);
 
 var baseAllowedGender = new Schema({
 	allowedGender: {

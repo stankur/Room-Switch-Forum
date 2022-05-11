@@ -1,5 +1,7 @@
 var schemaBuilder = require("../helpers/schemaBuilder");
 var arrayOrBaseValidator = require("./validators/arrayOrBaseSchemaValidator");
+var intervalValidator =
+	require("./validators/floorValidator").isValidPositiveRange;
 
 var createPreferenceArraySchema = function (baseShema, allPossibilites) {
 	var validatedBase = schemaBuilder
@@ -29,4 +31,15 @@ var createPreferenceArraySchema = function (baseShema, allPossibilites) {
 	return setDefaultArrayOfBase;
 };
 
-module.exports = createPreferenceArraySchema;
+var createIntervalSchema = function (baseSchema) {
+	var turnedIntoIntervalSchema = schemaBuilder
+		.modifyBaseSchema(baseSchema)
+		.createIntervalSchema(intervalValidator);
+
+	var setDefaultInterval = schemaBuilder
+		.modifyBaseSchema(turnedIntoIntervalSchema)
+		.setDefault(() => ({}));
+
+	return setDefaultInterval;
+};
+module.exports = { createPreferenceArraySchema, createIntervalSchema };

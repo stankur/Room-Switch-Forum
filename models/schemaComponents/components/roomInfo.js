@@ -2,7 +2,8 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var schemaBuilder = require("../../helpers/schemaBuilder");
-var createPreferenceSchema = require("../helper");
+var createPreferenceSchema = require("../helper").createPreferenceArraySchema;
+var createIntervalSchema = require("../helper").createIntervalSchema;
 
 var residencesModule = require("../../../staticInformation/residences");
 
@@ -56,17 +57,7 @@ var floor = (() => {
 	return setRequiredFloor;
 })();
 
-var floors = (() => {
-	var validatedFloors = schemaBuilder
-		.modifyBaseSchema(floor)
-		.validateWith(floorValidator.isValidPositiveRange);
-
-	var setDefaultFloors = schemaBuilder
-		.modifyBaseSchema(validatedFloors)
-		.setDefault([1, Infinity]);
-
-	return setDefaultFloors;
-})();
+var floors = createIntervalSchema(baseFloor);
 
 var baseWashroom = new Schema({
 	washroom: {
@@ -118,8 +109,6 @@ var building = (() => {
 	return setRequiredBuilding;
 })();
 
-var buildings = createPreferenceSchema(baseBuilding, allBuildings);
-
 var roomInfoRoomSchema = new Schema({
 	roomInfo: {
 		type: schemaBuilder.contatenateSchemas(room, floor, washroom, building),
@@ -129,12 +118,7 @@ var roomInfoRoomSchema = new Schema({
 
 var roomInfoPreferenceSchema = new Schema({
 	roomInfo: {
-		type: schemaBuilder.contatenateSchemas(
-			rooms,
-			floors,
-			washrooms,
-			buildings
-		),
+		type: schemaBuilder.contatenateSchemas(rooms, floors, washrooms),
 		default: () => ({}),
 	},
 });

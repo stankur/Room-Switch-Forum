@@ -262,7 +262,13 @@ describe("Offer test", () => {
 			],
 			preference: [
 				{
-					residenceAreas: ["Orchard Commons"],
+					residenceArea: ["Orchard Commons"],
+					generalInfo: {
+						floor: {
+							spec: "Interval",
+							criteria: [1, 10],
+						},
+					},
 				},
 			],
 		});

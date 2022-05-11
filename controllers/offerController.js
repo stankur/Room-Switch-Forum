@@ -1,13 +1,14 @@
+const { default: mongoose } = require("mongoose");
 var Offer = require("../models/Offer");
 
 var addFilters = (documentsSearch, traversedLayers, JSONElement) => {
-	console.log("traversedLayers recieved: " + traversedLayers.toString());
 	var path = traversedLayers.join(".");
+
 	if (!Object.keys(JSONElement)) {
 		return documentsSearch;
 	}
-	if (Object.keys(JSONElement).includes("type")) {
-		if (JSONElement["type"] === "Includes") {
+	if (Object.keys(JSONElement).includes("spec")) {
+		if (JSONElement["spec"] === "Includes") {
 			var included = JSONElement["criteria"];
 
 			return documentsSearch.where(path).elemMatch((elem) => {
@@ -16,29 +17,23 @@ var addFilters = (documentsSearch, traversedLayers, JSONElement) => {
 				}
 			});
 		}
-		if (JSONElement["type"] === "Interval") {
+		if (JSONElement["spec"] === "Interval") {
 			var interval = JSONElement["criteria"];
-			console.log("interval: " + interval);
 
 			interval = interval.map((num) => {
 				if (num === "Infinity") {
-					return Infinity;
+					return Number.MAX_SAFE_INTEGER;
 				}
 				return num;
 			});
 
 			var smallerNumber = interval[0];
-			console.log("smaller: " + smallerNumber);
 			var biggerNumber = interval[1];
-			console.log("bigger: " + biggerNumber);
 
-			var now = documentsSearch
+			return documentsSearch
 				.where(path)
 				.lte(biggerNumber)
 				.gte(smallerNumber);
-
-			console.log(now);
-			return now;
 		}
 	}
 
@@ -52,18 +47,25 @@ var addFilters = (documentsSearch, traversedLayers, JSONElement) => {
 	}
 
 	Object.keys(JSONElement).forEach((key) => {
-		documentsSearch = addFilters(
-			documentsSearch,
-			[...traversedLayers, key],
-			JSONElement[key]
-		);
+		if (key === "_id") {
+			// don't do anything because "_id" is not a field for filtering
+		} else {
+			documentsSearch = addFilters(
+				documentsSearch,
+				[...traversedLayers, key],
+				JSONElement[key]
+			);
+		}
 	});
 
-	console.log("doc search:" + documentsSearch);
 	return documentsSearch;
 };
 
-var getOffer = (req, res, next) => {
+var createInitialSearch = () => {
+	return Offer.find().lean().sort({ dateCreated: 1 });
+};
+
+var getOffers = (req, res, next) => {
 	var sendResult = (err, result) => {
 		if (err) {
 			return next(err);
@@ -72,11 +74,10 @@ var getOffer = (req, res, next) => {
 		return res.json(result);
 	};
 
-	var documentsSearch = Offer.find().lean().sort({ dateCreated: 1 });
+	var documentsSearch = createInitialSearch();
 
 	if (req.query) {
 		if (req.query.filter) {
-			console.log(req.query.filter);
 			var filterJSON = JSON.parse(req.query.filter);
 			documentsSearch = addFilters(documentsSearch, [], filterJSON);
 		}
@@ -96,4 +97,74 @@ var getOffer = (req, res, next) => {
 	return documentsSearch.exec(sendResult);
 };
 
-module.exports = { getOffer };
+var findOffer = (req, res, next) => {
+	var offerId = req.params.id;
+
+	Offer.findById(offerId)
+		.lean()
+		.exec((err, offer) => {
+			if (err) {
+				return next(err);
+			}
+
+			if (!offer) {
+				return next(new Error("no offer found"));
+			}
+
+			req.offer = offer;
+			return next();
+		});
+};
+
+var sendOffer = (req, res, next) => {
+	res.json(req.offer);
+};
+
+var getOffer = [findOffer, sendOffer];
+
+var sendMatches = (req, res, next) => {
+	var offer = req.offer;
+
+	var preference = offer["preference"];
+
+	var filters = preference.map((roomFilter) => {
+		return {
+			rooms: {
+				spec: "Includes",
+				criteria: roomFilter,
+			},
+		};
+	});
+
+	var query = Offer.find({
+		$and: [
+			{
+				$or: filters.map((filter) => {
+					return addFilters(
+						createInitialSearch(),
+						[],
+						filter
+					).getFilter();
+				}),
+			},
+
+			{
+				_id: { $ne: offer["_id"] },
+			},
+		],
+	})
+		.lean()
+		.sort({ dateCreated: 1 });
+
+	query.exec((err, offers) => {
+		if (err) {
+			return next(err);
+		}
+
+		res.json(offers);
+	});
+};
+
+var getMatches = [findOffer, sendMatches];
+
+module.exports = { getOffers, getOffer, getMatches };

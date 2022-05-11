@@ -5,6 +5,9 @@ var Schema = mongoose.Schema;
 
 var schemaBuilder = require("../schemaBuilder");
 
+var isValidPositiveRange =
+	require("../../schemaComponents/validators/floorValidator").isValidPositiveRange;
+
 var stringifyIncludingFunction = (object) => {
 	return JSON.stringify(object, function (key, val) {
 		return typeof val === "function"
@@ -267,7 +270,7 @@ describe("schema builder test", () => {
 			});
 
 		var expected = new Schema({
-			rooms: {
+			room: {
 				type: [
 					{
 						type: String,
@@ -287,6 +290,44 @@ describe("schema builder test", () => {
 				validate: {
 					validator: function (value) {
 						return value.length >= 1;
+					},
+				},
+				required: false,
+			},
+		});
+
+		expect(stringifyIncludingFunction(modifiedSchema.obj)).to.equal(
+			stringifyIncludingFunction(expected.obj)
+		);
+	});
+
+	it("could create and interval schema given a base schema", () => {
+		var testSchema = new Schema({
+			floor: Schema.Types.Mixed,
+		});
+
+		var modifiedSchema = schemaBuilder
+			.modifyBaseSchema(testSchema)
+			.createIntervalSchema(isValidPositiveRange);
+
+		var expected = new Schema({
+			floor: {
+				type: {
+					spec: {
+						type: String,
+						validator: {
+							validate: function (value) {
+								return value === "Interval";
+							},
+						},
+						default: "Interval",
+					},
+					criteria: {
+						type: [Number],
+						validator: {
+							validate: isValidPositiveRange,
+						},
+						default: [1, Number.MAX_SAFE_INTEGER],
 					},
 				},
 				required: false,
