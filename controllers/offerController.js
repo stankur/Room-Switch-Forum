@@ -1,69 +1,8 @@
-const { default: mongoose } = require("mongoose");
 var Offer = require("../models/Offer");
 
-var addFilters = (documentsSearch, traversedLayers, JSONElement) => {
-	var path = traversedLayers.join(".");
-
-	if (!Object.keys(JSONElement)) {
-		return documentsSearch;
-	}
-	if (Object.keys(JSONElement).includes("spec")) {
-		if (JSONElement["spec"] === "Includes") {
-			var included = JSONElement["criteria"];
-
-			return documentsSearch.where(path).elemMatch((elem) => {
-				for (const [key, value] of Object.entries(included)) {
-					addFilters(elem, [key], value);
-				}
-			});
-		}
-		if (JSONElement["spec"] === "Interval") {
-			var interval = JSONElement["criteria"];
-
-			interval = interval.map((num) => {
-				if (num === "Infinity") {
-					return Number.MAX_SAFE_INTEGER;
-				}
-				return num;
-			});
-
-			var smallerNumber = interval[0];
-			var biggerNumber = interval[1];
-
-			return documentsSearch
-				.where(path)
-				.lte(biggerNumber)
-				.gte(smallerNumber);
-		}
-	}
-
-	if (JSONElement instanceof Array) {
-		var preferences = JSONElement;
-		return documentsSearch.where(path).in(preferences);
-	}
-
-	if (!(JSONElement instanceof Object)) {
-		return documentsSearch.where({ [path]: JSONElement });
-	}
-
-	Object.keys(JSONElement).forEach((key) => {
-		if (key === "_id") {
-			// don't do anything because "_id" is not a field for filtering
-		} else {
-			documentsSearch = addFilters(
-				documentsSearch,
-				[...traversedLayers, key],
-				JSONElement[key]
-			);
-		}
-	});
-
-	return documentsSearch;
-};
-
-var createInitialSearch = () => {
-	return Offer.find().lean().sort({ dateCreated: 1 });
-};
+var addFilters = require("./helpers/addFilters");
+var createInitialSearch = require("./helpers/createInitialSeacrh");
+var queryChecker = require("./helpers/queryChecker");
 
 var getOffers = (req, res, next) => {
 	var sendResult = (err, result) => {
@@ -74,25 +13,9 @@ var getOffers = (req, res, next) => {
 		return res.json(result);
 	};
 
-	var documentsSearch = createInitialSearch();
-
-	if (req.query) {
-		if (req.query.filter) {
-			var filterJSON = JSON.parse(req.query.filter);
-			documentsSearch = addFilters(documentsSearch, [], filterJSON);
-		}
-
-		if (req.query.page && req.query.limit) {
-			var pageNumber = req.query.page;
-			var limitPerpage = req.query.limit;
-
-			if (pageNumber > 0 && limitPerpage > 0) {
-				documentsSearch = documentsSearch
-					.skip((pageNumber - 1) * limitPerpage)
-					.limit(limitPerpage);
-			}
-		}
-	}
+	var documentsSearch = queryChecker(req.query, createInitialSearch())
+		.applyFilter()
+		.applyPagination().modifiedDocumentsSearch;
 
 	return documentsSearch.exec(sendResult);
 };
@@ -136,7 +59,7 @@ var sendMatches = (req, res, next) => {
 		};
 	});
 
-	var query = Offer.find({
+	var documentsSearch = Offer.find({
 		$and: [
 			{
 				$or: filters.map((filter) => {
@@ -156,15 +79,103 @@ var sendMatches = (req, res, next) => {
 		.lean()
 		.sort({ dateCreated: 1 });
 
-	query.exec((err, offers) => {
+	documentsSearch = queryChecker(req.query, documentsSearch)
+		.applyFilter()
+		.applyPagination().modifiedDocumentsSearch;
+
+	var sendResult = (err, offers) => {
 		if (err) {
 			return next(err);
 		}
 
-		res.json(offers);
-	});
+		return res.json(offers);
+	};
+
+	return documentsSearch.exec(sendResult);
 };
 
 var getMatches = [findOffer, sendMatches];
 
-module.exports = { getOffers, getOffer, getMatches };
+var createOffer = (req, res, next) => {
+	var offer = req.body.offer;
+
+	if (!offer) {
+		return next(
+			new Error("offer is not attached in the body of the request.")
+		);
+	}
+
+	if (!(offer instanceof Object)) {
+		return next(new Error("offer must be of type object."));
+	}
+
+	var remove = (object, key) => {
+		var modified = {};
+
+		Object.keys(object).forEach((objKey) => {
+			if (objKey === key) {
+				return;
+			}
+			modified = { ...modified, [objKey]: object[objKey] };
+			return;
+		});
+
+		return modified;
+	};
+
+	offer = remove(offer, "dateCreated");
+
+	try {
+		offer["rooms"] = offer["rooms"].map((room) => {
+			try {
+				room["generalInfo"] = remove(
+					room["generalInfo"],
+					"residenceType"
+				);
+			} catch (err) {}
+
+			return room;
+		});
+	} catch (err) {}
+
+	try {
+		offer["rooms"] = offer["rooms"].map((room) => {
+			try {
+				room["eligibilityInfo"] = remove(
+					room["eligibilityInfo"],
+					"minimumAge"
+				);
+			} catch (err) {}
+
+			return room;
+		});
+	} catch (err) {}
+
+	var newOffer = new Offer(offer);
+
+	newOffer.save((err, newOffer) => {
+		if (err) {
+			return next(err);
+		}
+
+		return res.json(newOffer);
+	});
+};
+
+var deleteOffer = (req, res, next) => {
+	var offerId = req.params.id;
+
+	Offer.findByIdAndDelete(offerId, (err, foundOffer) => {
+		if (err) {
+			return next(err);
+		}
+
+		if (!foundOffer) {
+			return next(new Error("no offer with given id found"));
+		}
+
+		res.json(foundOffer);
+	});
+};
+
+module.exports = { getOffers, getOffer, getMatches, createOffer, deleteOffer };

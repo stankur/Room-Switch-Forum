@@ -1,19 +1,30 @@
 var mongoose = require("mongoose");
 
-var Offer = require("../../models/Offer");
+const { expect } = require("chai");
+
 var offerController = require("../offerController");
+
+var residencesModule = require("../../staticInformation/residences");
+var testOffers = require("./testOffers");
 
 var mongoConfigTesting = require("../../mongoConfigTesting");
 
 const request = require("supertest");
 const express = require("express");
+const e = require("express");
+const { response } = require("express");
+const Offer = require("../../models/Offer");
+
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-const { expect } = require("chai");
-
-app.use(express.urlencoded({ extended: false }));
 app.get("/", offerController.getOffers);
 app.get("/:id/matches", offerController.getMatches);
+
+app.post("/", offerController.createOffer);
+
+app.delete("/:id", offerController.deleteOffer);
 
 var expectDataToEqual = (data, exepcted) => {
 	expect(data.length).to.equal(exepcted.length);
@@ -44,210 +55,15 @@ describe("offer controller test", () => {
 	before(async () => {
 		await mongoConfigTesting.initializeMongoServer();
 
-		testOffer1 = new Offer({
-			numberOfPeople: 1,
-			roomsWanted: 1,
-			rooms: [
-				{
-					residenceArea: "Orchard Commons",
-					generalInfo: {
-						session: "Winter Session",
-					},
-					roomInfo: {
-						room: "Connected Single Room",
-						floor: 14,
-						washroom: "Private",
-						building: "Braeburn House",
-					},
-					eligibilityInfo: {
-						allowedGender: "Male",
-					},
-				},
-			],
-		});
-
-		testOffer2 = new Offer({
-			numberOfPeople: 1,
-			roomsWanted: 1,
-			rooms: [
-				{
-					residenceArea: "St. John's College",
-					generalInfo: {
-						session: "Year Round",
-					},
-					roomInfo: {
-						room: "Single Traditional Room",
-						floor: 1,
-						washroom: "Private",
-					},
-					eligibilityInfo: {
-						allowedGender: "Any",
-					},
-				},
-			],
-		});
-
-		testOffer3 = new Offer({
-			numberOfPeople: 2,
-			roomsWanted: 2,
-			rooms: [
-				{
-					residenceArea: "Totem Park",
-					generalInfo: {
-						session: "Winter Session",
-					},
-					roomInfo: {
-						room: "Shared Room",
-						floor: 1,
-						washroom: "Communal",
-						building: "Nootka House",
-					},
-					eligibilityInfo: {
-						allowedGender: "Male",
-					},
-				},
-			],
-			preference: [
-				{
-					residenceArea: [
-						"Orchard Commons",
-						"Totem Park",
-						"Exchange",
-						"Fraser Hall",
-					],
-					roomInfo: {
-						floor: {
-							spec: "Interval",
-							criteria: [1, 9],
-						},
-					},
-				},
-			],
-		});
-
-		testOffer4 = new Offer({
-			numberOfPeople: 1,
-			roomsWanted: 1,
-			rooms: [
-				{
-					residenceArea: "Exchange",
-					generalInfo: {
-						session: "Year Round",
-					},
-					roomInfo: {
-						room: "Studio Suite",
-						floor: 10,
-						washroom: "Private",
-					},
-					eligibilityInfo: {
-						allowedGender: "Male",
-					},
-				},
-			],
-		});
-		testOffer5 = new Offer({
-			numberOfPeople: 2,
-			roomsWanted: 1,
-			rooms: [
-				{
-					residenceArea: "Fraser Hall",
-					generalInfo: {
-						session: "Year Round",
-					},
-					roomInfo: {
-						room: "Six Bedroom Suite",
-						floor: 8,
-						washroom: "Private",
-					},
-					eligibilityInfo: {
-						allowedGender: "Female",
-					},
-				},
-			],
-		});
-		testOffer6 = new Offer({
-			numberOfPeople: 1,
-			roomsWanted: 1,
-			rooms: [
-				{
-					residenceArea: "Marine Drive",
-					generalInfo: {
-						session: "Year Round",
-					},
-					roomInfo: {
-						room: "Two Bedroom Suite",
-						floor: 4,
-						washroom: "Private",
-						building: "Marine Drive 6",
-					},
-					eligibilityInfo: {
-						allowedGender: "Female",
-					},
-				},
-			],
-		});
-		testOffer7 = new Offer({
-			numberOfPeople: 2,
-			roomsWanted: 1,
-			rooms: [
-				{
-					residenceArea: "Ritsumeikan-UBC House",
-					generalInfo: {
-						session: "Winter Session",
-					},
-					roomInfo: {
-						room: "Four Bedroom Suite",
-						floor: 14,
-						washroom: "Private",
-					},
-					eligibilityInfo: {
-						allowedGender: "Any",
-					},
-				},
-			],
-		});
-		testOffer8 = new Offer({
-			numberOfPeople: 1,
-			roomsWanted: 1,
-			rooms: [
-				{
-					residenceArea: "Thunderbird",
-					generalInfo: {
-						session: "Year Round",
-					},
-					roomInfo: {
-						room: "Studio Suite",
-						floor: 3,
-						washroom: "Private",
-						building: "1000 Block - Cassiar",
-					},
-					eligibilityInfo: {
-						allowedGender: "Any",
-					},
-				},
-			],
-		});
-		testOffer9 = new Offer({
-			numberOfPeople: 2,
-			roomsWanted: 1,
-			rooms: [
-				{
-					residenceArea: "Acadia Park",
-					generalInfo: {
-						session: "Year Round",
-					},
-					roomInfo: {
-						room: "One Bedroom Suite",
-						floor: 7,
-						washroom: "Private",
-						building: "Presidents Row",
-					},
-					eligibilityInfo: {
-						allowedGender: "Any",
-					},
-				},
-			],
-		});
+		testOffer1 = testOffers.testOffer1;
+		testOffer2 = testOffers.testOffer2;
+		testOffer3 = testOffers.testOffer3;
+		testOffer4 = testOffers.testOffer4;
+		testOffer5 = testOffers.testOffer5;
+		testOffer6 = testOffers.testOffer6;
+		testOffer7 = testOffers.testOffer7;
+		testOffer8 = testOffers.testOffer8;
+		testOffer9 = testOffers.testOffer9;
 
 		allOffers = [
 			testOffer1,
@@ -405,11 +221,191 @@ describe("offer controller test", () => {
 					});
 			});
 		});
+
+		describe("paginate test", () => {
+			it("doesn't paginate when one of page or limit is not present in the query", (done) => {
+				request(app)
+					.get("/")
+					.query({
+						page: 1,
+					})
+					.expect("Content-Type", /json/)
+					.expect(200)
+					.end((err, response) => {
+						if (err) {
+							done(err);
+						} else {
+							var data = JSON.parse(response["text"]);
+
+							expectDataToEqual(data, allOffers);
+							next();
+						}
+					});
+
+				var next = () => {
+					request(app)
+						.get("/")
+						.query({
+							page: 3,
+						})
+						.expect("Content-Type", /json/)
+						.expect(200)
+						.end((err, response) => {
+							if (err) {
+								done(err);
+							} else {
+								var data = JSON.parse(response["text"]);
+
+								expectDataToEqual(data, allOffers);
+								next1();
+							}
+						});
+				};
+
+				var next1 = () => {
+					request(app)
+						.get("/")
+						.query({
+							limit: 9,
+						})
+						.expect("Content-Type", /json/)
+						.expect(200)
+						.end((err, response) => {
+							if (err) {
+								done(err);
+							} else {
+								var data = JSON.parse(response["text"]);
+
+								expectDataToEqual(data, allOffers);
+								next2();
+							}
+						});
+				};
+
+				var next2 = () => {
+					request(app)
+						.get("/")
+						.query({
+							limit: 3,
+						})
+						.expect("Content-Type", /json/)
+						.expect(200)
+						.end((err, response) => {
+							if (err) {
+								done(err);
+							} else {
+								var data = JSON.parse(response["text"]);
+
+								expectDataToEqual(data, allOffers);
+								done();
+							}
+						});
+				};
+			});
+
+			it("paginates properly when both page and limit are present in the query", (done) => {
+				request(app)
+					.get("/")
+					.query({
+						limit: 5,
+						page: 1,
+					})
+					.expect("Content-Type", /json/)
+					.expect(200)
+					.end((err, response) => {
+						if (err) {
+							done(err);
+						} else {
+							var data = JSON.parse(response["text"]);
+
+							expectDataToEqual(data, [
+								testOffer1,
+								testOffer2,
+								testOffer3,
+								testOffer4,
+								testOffer5,
+							]);
+							next();
+						}
+					});
+
+				var next = () => {
+					request(app)
+						.get("/")
+						.query({
+							limit: 3,
+							page: 3,
+						})
+						.expect("Content-Type", /json/)
+						.expect(200)
+						.end((err, response) => {
+							if (err) {
+								done(err);
+							} else {
+								var data = JSON.parse(response["text"]);
+
+								expectDataToEqual(data, [
+									testOffer7,
+									testOffer8,
+									testOffer9,
+								]);
+								next1();
+							}
+						});
+				};
+
+				var next1 = () => {
+					request(app)
+						.get("/")
+						.query({
+							limit: 3,
+							page: 3,
+						})
+						.expect("Content-Type", /json/)
+						.expect(200)
+						.end((err, response) => {
+							if (err) {
+								done(err);
+							} else {
+								var data = JSON.parse(response["text"]);
+
+								expectDataToEqual(data, [
+									testOffer7,
+									testOffer8,
+									testOffer9,
+								]);
+								next2();
+							}
+						});
+				};
+
+				var next2 = () => {
+					request(app)
+						.get("/")
+						.query({
+							limit: 3,
+							page: 4,
+						})
+						.expect("Content-Type", /json/)
+						.expect(200)
+						.end((err, response) => {
+							if (err) {
+								done(err);
+							} else {
+								var data = JSON.parse(response["text"]);
+
+								expect(Object.keys(data).length).to.equal(0);
+
+								done();
+							}
+						});
+				};
+			});
+		});
 	});
 
 	describe("get matches test", () => {
 		it("could get all offers of default preference", (done) => {
-			console.log("id given: " + testOffer1.id);
 			request(app)
 				.get("/" + testOffer1.id + "/matches")
 				.expect("Content-Type", /json/)
@@ -436,7 +432,6 @@ describe("offer controller test", () => {
 		});
 
 		it("could get offers matching custom preference", (done) => {
-			console.log("id given: " + testOffer3.id);
 			request(app)
 				.get("/" + testOffer3.id + "/matches")
 				.expect("Content-Type", /json/)
@@ -449,6 +444,232 @@ describe("offer controller test", () => {
 						expectDataToEqual(data, [testOffer5]);
 						done();
 					}
+				});
+		});
+	});
+
+	describe("create offer test", () => {
+		var isDate = (dateString) => {
+			return (
+				new Date(dateString) !== "Invalid Date" &&
+				!isNaN(new Date(dateString))
+			);
+		};
+
+		var testHasValidDefaultFields = (data) => {
+			expect(isDate(data["dateCreated"])).to.be.true;
+
+			data["rooms"].forEach((room) => {
+				var residenceArea = room["residenceArea"];
+				var residenceType = room["generalInfo"]["residenceType"];
+				var miminumAge = room["eligibilityInfo"]["minimumAge"];
+
+				expect(residenceType).to.equal(
+					residencesModule.getTypeOf(residenceArea)
+				);
+
+				expect(miminumAge).to.equal(
+					residencesModule.getMinimumAgeOf(residenceArea)
+				);
+			});
+		};
+
+		it("could create a new offer when offer json's rooms' room do not have fields 'dateCreated', 'residenceType', nor 'minimumAge'", (done) => {
+			request(app)
+				.post("/")
+				.send({
+					offer: {
+						numberOfPeople: 1,
+						roomsWanted: 1,
+						rooms: [
+							{
+								residenceArea: "Orchard Commons",
+								generalInfo: {
+									session: "Winter Session",
+								},
+								roomInfo: {
+									room: "Connected Single Room",
+									floor: 10,
+									washroom: "Private",
+									building: "Bartlett House",
+								},
+								eligibilityInfo: {
+									allowedGender: "Any",
+								},
+							},
+						],
+					},
+				})
+				.expect("Content-Type", /json/)
+				.expect(200)
+				.end((err, response) => {
+					if (err) {
+						done(err);
+					} else {
+						var data = JSON.parse(response["text"]);
+
+						testHasValidDefaultFields(data);
+						done();
+					}
+				});
+		});
+
+		it("could remove dateCreated field", (done) => {
+			request(app)
+				.post("/")
+				.send({
+					offer: {
+						numberOfPeople: 1,
+						roomsWanted: 1,
+						dateCreated: "now lmao",
+						rooms: [
+							{
+								residenceArea: "Orchard Commons",
+								generalInfo: {
+									session: "Winter Session",
+								},
+								roomInfo: {
+									room: "Connected Single Room",
+									floor: 10,
+									washroom: "Private",
+									building: "Bartlett House",
+								},
+								eligibilityInfo: {
+									allowedGender: "Any",
+								},
+							},
+						],
+					},
+				})
+				.expect("Content-Type", /json/)
+				.expect(200)
+				.end((err, response) => {
+					if (err) {
+						done(err);
+					} else {
+						var data = JSON.parse(response["text"]);
+
+						testHasValidDefaultFields(data);
+						done();
+					}
+				});
+		});
+
+		it("could remove residenceType field", (done) => {
+			request(app)
+				.post("/")
+				.send({
+					offer: {
+						numberOfPeople: 1,
+						roomsWanted: 1,
+						rooms: [
+							{
+								residenceArea: "Orchard Commons",
+								generalInfo: {
+									residenceType: "lol jrijirjgirjg",
+									session: "Winter Session",
+								},
+								roomInfo: {
+									room: "Connected Single Room",
+									floor: 10,
+									washroom: "Private",
+									building: "Bartlett House",
+								},
+								eligibilityInfo: {
+									allowedGender: "Any",
+								},
+							},
+						],
+					},
+				})
+				.expect("Content-Type", /json/)
+				.expect(200)
+				.end((err, response) => {
+					if (err) {
+						done(err);
+					} else {
+						var data = JSON.parse(response["text"]);
+
+						testHasValidDefaultFields(data);
+
+						done();
+					}
+				});
+		});
+
+		it("could remove invalid minimumAge", (done) => {
+			request(app)
+				.post("/")
+				.send({
+					offer: {
+						numberOfPeople: 1,
+						roomsWanted: 1,
+						rooms: [
+							{
+								residenceArea: "Orchard Commons",
+								generalInfo: {
+									session: "Winter Session",
+								},
+								roomInfo: {
+									room: "Connected Single Room",
+									floor: 10,
+									washroom: "Private",
+									building: "Bartlett House",
+								},
+								eligibilityInfo: {
+									allowedGender: "Any",
+									minimumAge: "yey",
+								},
+							},
+						],
+					},
+				})
+				.expect("Content-Type", /json/)
+				.expect(200)
+				.end((err, response) => {
+					if (err) {
+						done(err);
+					} else {
+						var data = JSON.parse(response["text"]);
+
+						testHasValidDefaultFields(data);
+
+						done();
+					}
+				});
+		});
+	});
+
+	describe("delete offer test", () => {
+		it("could delete offer when given id is present", (done) => {
+			request(app)
+				.delete("/" + testOffer1.id)
+				.expect("Content-Type", /json/)
+				.expect(200)
+				.end((err) => {
+					if (err) {
+						return done(err);
+					}
+
+					Offer.findById(testOffer1.id, (err, foundOffer) => {
+						if (err) {
+							return done(err);
+						} else {
+							expect(foundOffer).to.be.not.ok;
+							done();
+						}
+					});
+				});
+		});
+
+		it("works when given id does not exist", (done) => {
+			request(app)
+				.delete("/" + new mongoose.Types.ObjectId())
+				.expect("Content-Type", /json/)
+				.expect(200)
+				.end((err) => {
+					expect(err).to.be.ok;
+					done();
 				});
 		});
 	});
