@@ -69,7 +69,8 @@ describe("Offer test", () => {
 					},
 				},
 			],
-		});
+
+        });
 
 		testOffer.validate((err) => {
 			expect(errorExist("numberOfPeople", err.errors)).to.be.true;

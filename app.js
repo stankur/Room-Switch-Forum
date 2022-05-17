@@ -12,6 +12,9 @@ var residences = require("./staticInformation/residences");
 var app = express();
 
 require("./mongoConfig");
+var passport = require("./passportConfig");
+
+app.use(passport.initialize());
 
 app.use(logger("dev"));
 app.use(express.json());

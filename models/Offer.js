@@ -1,7 +1,7 @@
 var Preference = require("./embeddedDocuments/Preference");
 
 var mongoose = require("mongoose");
-const Room = require("./embeddedDocuments/Room");
+var Room = require("./embeddedDocuments/Room");
 var Schema = mongoose.Schema;
 
 var numberOfPeopleValidator = function (value) {

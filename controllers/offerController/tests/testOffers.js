@@ -1,4 +1,4 @@
-var Offer = require("../../models/Offer");
+var Offer = require("../../../models/Offer");
 var testOffer1;
 var testOffer2;
 var testOffer3;

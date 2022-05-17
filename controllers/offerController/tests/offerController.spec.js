@@ -4,16 +4,14 @@ const { expect } = require("chai");
 
 var offerController = require("../offerController");
 
-var residencesModule = require("../../staticInformation/residences");
+var residencesModule = require("../../../staticInformation/residences");
 var testOffers = require("./testOffers");
 
-var mongoConfigTesting = require("../../mongoConfigTesting");
+var mongoConfigTesting = require("../../../mongoConfigTesting");
 
 const request = require("supertest");
 const express = require("express");
-const e = require("express");
-const { response } = require("express");
-const Offer = require("../../models/Offer");
+const Offer = require("../../../models/Offer");
 
 const app = express();
 app.use(express.json());
@@ -87,7 +85,7 @@ describe("offer controller test", () => {
 		});
 	});
 	after(async () => {
-		await setTimeout(mongoConfigTesting.endMongoConnection, 1000);
+		await mongoConfigTesting.endMongoConnection();
 		console.log("connection closed");
 	});
 

@@ -1,4 +1,4 @@
-var Offer = require("../models/Offer");
+var Offer = require("../../models/Offer");
 
 var addFilters = require("./helpers/addFilters");
 var createInitialSearch = require("./helpers/createInitialSeacrh");
@@ -158,7 +158,7 @@ var createOffer = (req, res, next) => {
 			return next(err);
 		}
 
-		return res.json(newOffer);
+		return res.json(newOffer.toObject());
 	});
 };
 
