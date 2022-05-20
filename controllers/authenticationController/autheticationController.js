@@ -3,6 +3,8 @@ var User = require("../../models/User");
 var bcrypt = require("bcryptjs");
 var jsonWebToken = require("jsonwebtoken");
 
+var dayjs = require("dayjs");
+
 var checkExistence = (req, res, next) => {
 	var username = req.params.username;
 
@@ -59,7 +61,6 @@ var signUp = (req, res, next) => {
 						if (err) {
 							return next(err);
 						}
-
 						return res.json(newUser.toObject());
 					});
 				}
@@ -91,7 +92,8 @@ var logIn = (req, res, next) => {
 
 					var jwtPayload = {
 						id: foundUser._id,
-						iat: Date.now(),
+						iat: dayjs(Date.now()).valueOf(),
+						exp: dayjs(Date.now()).add(7, "day").valueOf(),
 					};
 
 					var signedToken =

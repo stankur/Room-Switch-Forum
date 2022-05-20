@@ -24,6 +24,7 @@ app.post("/", offerController.createOffer);
 
 app.delete("/:id", offerController.deleteOffer);
 
+
 var expectDataToEqual = (data, exepcted) => {
 	expect(data.length).to.equal(exepcted.length);
 
@@ -39,6 +40,11 @@ var expectDataToEqual = (data, exepcted) => {
 };
 
 describe("offer controller test", () => {
+	var user1;
+	var user2;
+	var user3;
+	var user4;
+
 	var testOffer1;
 	var testOffer2;
 	var testOffer3;
@@ -52,6 +58,10 @@ describe("offer controller test", () => {
 	var allOffers;
 	before(async () => {
 		await mongoConfigTesting.initializeMongoServer();
+		user1 = testOffers.user1;
+		user2 = testOffers.user2;
+		user3 = testOffers.user3;
+		user4 = testOffers.user4;
 
 		testOffer1 = testOffers.testOffer1;
 		testOffer2 = testOffers.testOffer2;
@@ -62,6 +72,8 @@ describe("offer controller test", () => {
 		testOffer7 = testOffers.testOffer7;
 		testOffer8 = testOffers.testOffer8;
 		testOffer9 = testOffers.testOffer9;
+
+		allUsers = [user1, user2, user3, user4];
 
 		allOffers = [
 			testOffer1,
@@ -75,6 +87,16 @@ describe("offer controller test", () => {
 			testOffer9,
 		];
 
+		allUsers.forEach(async (user) => {
+			try {
+				await user.save();
+				console.log("succesfully saved user!");
+			} catch (err) {
+				console.log("error when saving user: " + user + "!");
+			} finally {
+				return;
+			}
+		});
 		allOffers.forEach(async (testOffer) => {
 			try {
 				await testOffer.save();
@@ -90,7 +112,7 @@ describe("offer controller test", () => {
 	});
 
 	describe("get offer test", () => {
-		it("could get all offers", (done) => {
+		it("could get all offers and have the right fields", (done) => {
 			request(app)
 				.get("/")
 				.expect("Content-Type", /json/)
@@ -101,6 +123,15 @@ describe("offer controller test", () => {
 					} else {
 						var data = JSON.parse(response["text"]);
 						expectDataToEqual(data, allOffers);
+
+						console.log(JSON.stringify(data));
+
+						expect(data[0]["user"]["username"]).to.eql("bob1");
+						expect(data[0]["user"]["password"]).to.not.be.ok;
+
+						expect(data[4]["user"]["username"]).to.eql("bob2");
+						expect(data[4]["user"]["password"]).to.not.be.ok;
+
 						done();
 					}
 				});
@@ -496,6 +527,9 @@ describe("offer controller test", () => {
 								},
 							},
 						],
+						user: new mongoose.Types.ObjectId(),
+						additionalInformation:
+							"contact me at my Instagram @whatever",
 					},
 				})
 				.expect("Content-Type", /json/)
@@ -537,6 +571,9 @@ describe("offer controller test", () => {
 								},
 							},
 						],
+						user: new mongoose.Types.ObjectId(),
+						additionalInformation:
+							"contact me at my Instagram @whatever",
 					},
 				})
 				.expect("Content-Type", /json/)
@@ -578,6 +615,9 @@ describe("offer controller test", () => {
 								},
 							},
 						],
+						user: new mongoose.Types.ObjectId(),
+						additionalInformation:
+							"contact me at my Instagram @whatever",
 					},
 				})
 				.expect("Content-Type", /json/)
@@ -620,6 +660,9 @@ describe("offer controller test", () => {
 								},
 							},
 						],
+						user: new mongoose.Types.ObjectId(),
+						additionalInformation:
+							"contact me at my Instagram @whatever",
 					},
 				})
 				.expect("Content-Type", /json/)

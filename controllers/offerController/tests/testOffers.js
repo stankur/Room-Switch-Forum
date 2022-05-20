@@ -1,4 +1,13 @@
+var mongoose = require("mongoose");
+
 var Offer = require("../../../models/Offer");
+var User = require("../../../models/User");
+
+var user1;
+var user2;
+var user3;
+var user4;
+
 var testOffer1;
 var testOffer2;
 var testOffer3;
@@ -8,6 +17,26 @@ var testOffer6;
 var testOffer7;
 var testOffer8;
 var testOffer9;
+
+user1 = new User({
+	username: "bob1",
+	password: "bob1",
+});
+
+user2 = new User({
+	username: "bob2",
+	password: "bob2",
+});
+
+user3 = new User({
+	username: "bob3",
+	password: "bob3",
+});
+
+user4 = new User({
+	username: "bob4",
+	password: "bob4",
+});
 
 testOffer1 = new Offer({
 	numberOfPeople: 1,
@@ -29,6 +58,8 @@ testOffer1 = new Offer({
 			},
 		},
 	],
+	user: user1.id,
+	additionalInformation: "contact me at my Instagram @whatever",
 });
 
 testOffer2 = new Offer({
@@ -50,6 +81,8 @@ testOffer2 = new Offer({
 			},
 		},
 	],
+	user: user2.id,
+	additionalInformation: "contact me at my Instagram @whatever",
 });
 
 testOffer3 = new Offer({
@@ -88,6 +121,8 @@ testOffer3 = new Offer({
 			},
 		},
 	],
+	user: user3.id,
+	additionalInformation: "contact me at my Instagram @whatever",
 });
 
 testOffer4 = new Offer({
@@ -109,6 +144,8 @@ testOffer4 = new Offer({
 			},
 		},
 	],
+	user: user4.id,
+	additionalInformation: "contact me at my Instagram @whatever",
 });
 testOffer5 = new Offer({
 	numberOfPeople: 2,
@@ -129,6 +166,8 @@ testOffer5 = new Offer({
 			},
 		},
 	],
+	user: user2.id,
+	additionalInformation: "contact me at my Instagram @whatever",
 });
 testOffer6 = new Offer({
 	numberOfPeople: 1,
@@ -150,6 +189,8 @@ testOffer6 = new Offer({
 			},
 		},
 	],
+	user: user3.id,
+	additionalInformation: "contact me at my Instagram @whatever",
 });
 testOffer7 = new Offer({
 	numberOfPeople: 2,
@@ -170,6 +211,8 @@ testOffer7 = new Offer({
 			},
 		},
 	],
+	user: user4.id,
+	additionalInformation: "contact me at my Instagram @whatever",
 });
 testOffer8 = new Offer({
 	numberOfPeople: 1,
@@ -191,6 +234,8 @@ testOffer8 = new Offer({
 			},
 		},
 	],
+	user: user2.id,
+	additionalInformation: "contact me at my Instagram @whatever",
 });
 testOffer9 = new Offer({
 	numberOfPeople: 2,
@@ -212,9 +257,15 @@ testOffer9 = new Offer({
 			},
 		},
 	],
+	user: user3.id,
+	additionalInformation: "contact me at my Instagram @whatever",
 });
 
 module.exports = {
+	user1,
+	user2,
+	user3,
+	user4,
 	testOffer1,
 	testOffer2,
 	testOffer3,

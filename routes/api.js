@@ -10,7 +10,6 @@ router.get("/offers/:id/matches", offerController.getMatches);
 
 router.post("/offers", offerController.createOffer);
 
-
 router.delete("/offers/:id", offerController.deleteOffer);
 
 router.get("/residences", (res, req, next) => {

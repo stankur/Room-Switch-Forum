@@ -29,6 +29,8 @@ describe("Offer test", () => {
 			expect(errorExist("roomsWanted", err.errors)).to.be.false;
 			expect(errorExist("preference", err.errors)).to.be.false;
 			expect(errorExist("dateCreated", err.errors)).to.be.false;
+			expect(errorExist("additionalInformation", err.errors)).to.be.true;
+			expect(errorExist("user", err.errors)).to.be.true;
 
 			done();
 		});
@@ -69,8 +71,9 @@ describe("Offer test", () => {
 					},
 				},
 			],
-
-        });
+			user: new mongoose.Types.ObjectId(),
+			additionalInformation: "contact me at my Instagram @whatever",
+		});
 
 		testOffer.validate((err) => {
 			expect(errorExist("numberOfPeople", err.errors)).to.be.true;
@@ -78,6 +81,8 @@ describe("Offer test", () => {
 			expect(errorExist("roomsWanted", err.errors)).to.be.false;
 			expect(errorExist("preference", err.errors)).to.be.false;
 			expect(errorExist("dateCreated", err.errors)).to.be.false;
+			expect(errorExist("additionalInformation", err.errors)).to.be.false;
+			expect(errorExist("user", err.errors)).to.be.false;
 
 			done();
 		});
@@ -104,6 +109,8 @@ describe("Offer test", () => {
 					},
 				},
 			],
+			user: new mongoose.Types.ObjectId(),
+			additionalInformation: "contact me at my Instagram @whatever",
 		});
 
 		testOffer.validate((err) => {
@@ -112,6 +119,9 @@ describe("Offer test", () => {
 			expect(errorExist("roomsWanted", err.errors)).to.be.true;
 			expect(errorExist("preference", err.errors)).to.be.false;
 			expect(errorExist("dateCreated", err.errors)).to.be.false;
+			expect(errorExist("additionalInformation", err.errors)).to.be.false;
+			expect(errorExist("user", err.errors)).to.be.false;
+
 			next1();
 		});
 
@@ -136,6 +146,8 @@ describe("Offer test", () => {
 						},
 					},
 				],
+				user: new mongoose.Types.ObjectId(),
+				additionalInformation: "contact me at my Instagram @whatever",
 			});
 
 			testOffer.validate((err) => {
@@ -166,6 +178,8 @@ describe("Offer test", () => {
 						},
 					},
 				],
+				user: new mongoose.Types.ObjectId(),
+				additionalInformation: "contact me at my Instagram @whatever",
 			});
 
 			testOffer.validate((err) => {
@@ -196,6 +210,8 @@ describe("Offer test", () => {
 						},
 					},
 				],
+				user: new mongoose.Types.ObjectId(),
+				additionalInformation: "contact me at my Instagram @whatever",
 			});
 
 			testOffer.validate((err) => {
@@ -226,6 +242,8 @@ describe("Offer test", () => {
 						},
 					},
 				],
+				user: new mongoose.Types.ObjectId(),
+				additionalInformation: "contact me at my Instagram @whatever",
 			});
 
 			testOffer.validate((err) => {
@@ -234,6 +252,9 @@ describe("Offer test", () => {
 				expect(errorExist("roomsWanted", err.errors)).to.be.true;
 				expect(errorExist("preference", err.errors)).to.be.false;
 				expect(errorExist("dateCreated", err.errors)).to.be.false;
+				expect(errorExist("additionalInformation", err.errors)).to.be
+					.false;
+				expect(errorExist("user", err.errors)).to.be.false;
 
 				done();
 			});
@@ -272,6 +293,8 @@ describe("Offer test", () => {
 					},
 				},
 			],
+			user: new mongoose.Types.ObjectId(),
+			additionalInformation: "contact me at my Instagram @whatever",
 		});
 
 		testOffer.validate((err) => {

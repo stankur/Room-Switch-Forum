@@ -25,11 +25,13 @@ var findOffer = (req, res, next) => {
 
 	Offer.findById(offerId)
 		.lean()
+		.populate("user", "username")
 		.exec((err, offer) => {
 			if (err) {
 				return next(err);
 			}
 
+			console.log(JSON.stringify(offer));
 			if (!offer) {
 				return next(new Error("no offer found"));
 			}
@@ -77,6 +79,7 @@ var sendMatches = (req, res, next) => {
 		],
 	})
 		.lean()
+		.populate("user", "username")
 		.sort({ dateCreated: 1 });
 
 	documentsSearch = queryChecker(req.query, documentsSearch)
