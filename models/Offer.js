@@ -47,7 +47,7 @@ var OfferSchema = new Schema({
 	},
 	dateCreated: {
 		type: Date,
-		default: Date.now(),
+		default: () => Date.now(),
 	},
 	user: {
 		type: Schema.Types.ObjectId,

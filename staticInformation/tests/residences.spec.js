@@ -19,7 +19,7 @@ describe("residences test", () => {
 			"Tec De Monterrey House",
 			"Korea-UBC House",
 			"Mawdsley House",
-			"Kakiutl House",
+			"Kwakiutl House",
 			"Shushwap House",
 			"q̓ələχən House",
 			"həm̓ləsəm̓ House",

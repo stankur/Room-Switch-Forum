@@ -129,7 +129,7 @@ describe("authentication controller test", () => {
 				.post("/sign-up")
 				.send({
 					username: "bob1",
-					password: "bob134",
+					password: "bob12345678",
 				})
 				.expect("Content-Type", /json/)
 				.expect(200)
@@ -151,7 +151,7 @@ describe("authentication controller test", () => {
 				.post("/sign-up")
 				.send({
 					username: "stankur",
-					password: "bob134",
+					password: "bob12345678",
 				})
 				.expect("Content-Type", /json/)
 				.expect(200)
@@ -174,7 +174,7 @@ describe("authentication controller test", () => {
 				.post("/log-in")
 				.send({
 					username: "kumal",
-					password: "bob134",
+					password: "bob12345678",
 				})
 				.expect("Content-Type", /json/)
 				.expect(200)
@@ -191,12 +191,12 @@ describe("authentication controller test", () => {
 				});
 		});
 
-		it("doesn't log in when wrong password is provided", (done) => {
+		it("logs in when right password is provided", (done) => {
 			request(app)
 				.post("/log-in")
 				.send({
 					username: "stankur",
-					password: "bob134",
+					password: "bob12345678",
 				})
 				.expect("Content-Type", /json/)
 				.expect(200)

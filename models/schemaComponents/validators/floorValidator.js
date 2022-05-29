@@ -12,8 +12,8 @@ var isNonDecreasing = function (value) {
 
 	return (
 		isPositiveInteger(first) &&
-		(isPositiveInteger(second) || second === Infinity) &&
-		second >= first
+		((isPositiveInteger(second) && second >= first) ||
+			second === "Infinity")
 	);
 };
 

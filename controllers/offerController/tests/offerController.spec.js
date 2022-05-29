@@ -19,11 +19,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", offerController.getOffers);
 app.get("/:id/matches", offerController.getMatches);
+app.get("/:id/offers", offerController.getOffersOfUser);
 
 app.post("/", offerController.createOffer);
 
 app.delete("/:id", offerController.deleteOffer);
-
 
 var expectDataToEqual = (data, exepcted) => {
 	expect(data.length).to.equal(exepcted.length);
@@ -76,15 +76,15 @@ describe("offer controller test", () => {
 		allUsers = [user1, user2, user3, user4];
 
 		allOffers = [
-			testOffer1,
-			testOffer2,
-			testOffer3,
-			testOffer4,
-			testOffer5,
-			testOffer6,
-			testOffer7,
-			testOffer8,
 			testOffer9,
+			testOffer8,
+			testOffer7,
+			testOffer6,
+			testOffer5,
+			testOffer4,
+			testOffer3,
+			testOffer2,
+			testOffer1,
 		];
 
 		allUsers.forEach(async (user) => {
@@ -126,7 +126,7 @@ describe("offer controller test", () => {
 
 						console.log(JSON.stringify(data));
 
-						expect(data[0]["user"]["username"]).to.eql("bob1");
+						expect(data[0]["user"]["username"]).to.eql("bob3");
 						expect(data[0]["user"]["password"]).to.not.be.ok;
 
 						expect(data[4]["user"]["username"]).to.eql("bob2");
@@ -151,7 +151,7 @@ describe("offer controller test", () => {
 							done(new Error(err));
 						} else {
 							var data = JSON.parse(response["text"]);
-							expectDataToEqual(data, [testOffer1, testOffer4]);
+							expectDataToEqual(data, [testOffer4, testOffer1]);
 							done();
 						}
 					});
@@ -171,10 +171,10 @@ describe("offer controller test", () => {
 						} else {
 							var data = JSON.parse(response["text"]);
 							expectDataToEqual(data, [
-								testOffer3,
-								testOffer5,
-								testOffer7,
 								testOffer9,
+								testOffer7,
+								testOffer5,
+								testOffer3,
 							]);
 
 							next();
@@ -195,11 +195,11 @@ describe("offer controller test", () => {
 							} else {
 								var data = JSON.parse(response["text"]);
 								expectDataToEqual(data, [
-									testOffer1,
-									testOffer2,
-									testOffer4,
-									testOffer6,
 									testOffer8,
+									testOffer6,
+									testOffer4,
+									testOffer2,
+									testOffer1,
 								]);
 
 								done();
@@ -241,9 +241,9 @@ describe("offer controller test", () => {
 						} else {
 							var data = JSON.parse(response["text"]);
 							expectDataToEqual(data, [
-								testOffer2,
-								testOffer6,
 								testOffer8,
+								testOffer6,
+								testOffer2,
 							]);
 							done();
 						}
@@ -348,10 +348,10 @@ describe("offer controller test", () => {
 							var data = JSON.parse(response["text"]);
 
 							expectDataToEqual(data, [
-								testOffer1,
-								testOffer2,
-								testOffer3,
-								testOffer4,
+								testOffer9,
+								testOffer8,
+								testOffer7,
+								testOffer6,
 								testOffer5,
 							]);
 							next();
@@ -374,34 +374,9 @@ describe("offer controller test", () => {
 								var data = JSON.parse(response["text"]);
 
 								expectDataToEqual(data, [
-									testOffer7,
-									testOffer8,
-									testOffer9,
-								]);
-								next1();
-							}
-						});
-				};
-
-				var next1 = () => {
-					request(app)
-						.get("/")
-						.query({
-							limit: 3,
-							page: 3,
-						})
-						.expect("Content-Type", /json/)
-						.expect(200)
-						.end((err, response) => {
-							if (err) {
-								done(err);
-							} else {
-								var data = JSON.parse(response["text"]);
-
-								expectDataToEqual(data, [
-									testOffer7,
-									testOffer8,
-									testOffer9,
+									testOffer3,
+									testOffer2,
+									testOffer1,
 								]);
 								next2();
 							}
@@ -446,14 +421,15 @@ describe("offer controller test", () => {
 						var data = JSON.parse(response["text"]);
 
 						expectDataToEqual(data, [
-							testOffer2,
-							testOffer3,
-							testOffer4,
-							testOffer5,
-							testOffer6,
-							testOffer7,
-							testOffer8,
 							testOffer9,
+							testOffer8,
+							testOffer7,
+							testOffer6,
+							testOffer5,
+							testOffer4,
+							testOffer3,
+
+							testOffer2,
 						]);
 						done();
 					}
@@ -711,6 +687,30 @@ describe("offer controller test", () => {
 				.end((err) => {
 					expect(err).to.be.ok;
 					done();
+				});
+		});
+	});
+
+	describe("get offers of user test", () => {
+		it("could get all offers of a given user", (done) => {
+			request(app)
+				.get("/" + user2.id + "/offers")
+				.expect("Content-Type", /json/)
+				.expect(200)
+				.end((err, response) => {
+					if (err) {
+						return done(err);
+					} else {
+						var data = JSON.parse(response["text"]);
+
+						expectDataToEqual(data, [
+							testOffer8,
+							testOffer5,
+							testOffer2,
+						]);
+
+						done();
+					}
 				});
 		});
 	});

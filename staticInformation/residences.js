@@ -42,7 +42,7 @@ residences.push(
 		["Winter Session"],
 		["Single Traditional Room", "Shared Room", "Connected Single Room"],
 		[
-			"Kakiutl House",
+			"Kwakiutl House",
 			"Shushwap House",
 			"q̓ələχən House",
 			"həm̓ləsəm̓ House",

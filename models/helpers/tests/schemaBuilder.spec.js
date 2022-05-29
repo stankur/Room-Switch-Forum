@@ -323,11 +323,11 @@ describe("schema builder test", () => {
 						default: "Interval",
 					},
 					criteria: {
-						type: [Number],
+						type: [Schema.Types.Mixed],
 						validator: {
 							validate: isValidPositiveRange,
 						},
-						default: [1, Number.MAX_SAFE_INTEGER],
+						default: [1, "Infinity"],
 					},
 				},
 				required: false,

@@ -80,7 +80,7 @@ var sendMatches = (req, res, next) => {
 	})
 		.lean()
 		.populate("user", "username")
-		.sort({ dateCreated: 1 });
+		.sort({ dateCreated: -1 });
 
 	documentsSearch = queryChecker(req.query, documentsSearch)
 		.applyFilter()
@@ -173,6 +173,14 @@ var deleteOffer = (req, res, next) => {
 			return next(err);
 		}
 
+		if (foundOffer.user.toString() !== req.user._id.toString()) {
+			return next(
+				new Error(
+					"the offer tried to be deleted doesn't belong to the user"
+				)
+			);
+		}
+
 		if (!foundOffer) {
 			return next(new Error("no offer with given id found"));
 		}
@@ -181,4 +189,27 @@ var deleteOffer = (req, res, next) => {
 	});
 };
 
-module.exports = { getOffers, getOffer, getMatches, createOffer, deleteOffer };
+var getOffersOfUser = (req, res, next) => {
+	var userId = req.params.id;
+
+	Offer.find({ user: userId })
+		.lean()
+		.populate("user", "username")
+		.sort({ dateCreated: -1, _id: 1 })
+		.exec((err, foundOffers) => {
+			if (err) {
+				return next(err);
+			}
+
+			return res.json(foundOffers);
+		});
+};
+
+module.exports = {
+	getOffers,
+	getOffer,
+	getMatches,
+	createOffer,
+	deleteOffer,
+	getOffersOfUser,
+};

@@ -96,7 +96,10 @@ var modifyBaseSchema = (baseSchema) => {
 							default: "Interval",
 						},
 
-						criteria: {},
+						criteria: {
+							type: [Schema.Types.Mixed],
+							default: [1, "Infinity"],
+						},
 					},
 					required: required ? true : false,
 				},
@@ -117,11 +120,11 @@ var modifyBaseSchema = (baseSchema) => {
 					},
 
 					criteria: {
-						type: [Number],
+						type: [Schema.Types.Mixed],
 						validator: {
 							validate: intervalValidator,
 						},
-						default: [1, Number.MAX_SAFE_INTEGER],
+						default: [1, "Infinity"],
 					},
 				},
 				required: required ? true : false,

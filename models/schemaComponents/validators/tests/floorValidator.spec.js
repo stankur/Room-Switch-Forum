@@ -44,6 +44,6 @@ describe("floor validator test", () => {
 	it("accepts valid array", () => {
 		expect(floorValidator([0, 3])).to.be.false;
 		expect(floorValidator([1, 3])).to.be.true;
-		expect(floorValidator([2, Infinity])).to.be.true;
+		expect(floorValidator([2, "Infinity"])).to.be.true;
 	});
 });
