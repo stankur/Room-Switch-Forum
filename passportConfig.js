@@ -1,11 +1,12 @@
 var dayjs = require("dayjs");
-require("dotenv").config();
 
 var passport = require("passport");
 const passportJWT = require("passport-jwt");
 const User = require("./models/User");
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
+
+require("dotenv").config();
 
 passport.use(
 	new JWTStrategy(
