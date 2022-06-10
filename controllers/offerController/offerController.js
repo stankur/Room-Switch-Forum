@@ -31,7 +31,6 @@ var findOffer = (req, res, next) => {
 				return next(err);
 			}
 
-			console.log(JSON.stringify(offer));
 			if (!offer) {
 				return next(new Error("no offer found"));
 			}
@@ -205,6 +204,34 @@ var getOffersOfUser = (req, res, next) => {
 		});
 };
 
+var updateDate = (req, res, next) => {
+	var offerId = req.params.id;
+
+	Offer.findByIdAndUpdate(
+		offerId,
+		{ dateCreated: Date.now() },
+		(err, foundOffer) => {
+			if (err) {
+				return next(err);
+			}
+
+			if (foundOffer.user.toString() !== req.user._id.toString()) {
+				return next(
+					new Error(
+						"the offer tried to be bumped doesn't belong to the user"
+					)
+				);
+			}
+
+			if (!foundOffer) {
+				return new Error("no offer with given id found");
+			}
+
+			res.json(foundOffer);
+		}
+	);
+};
+
 module.exports = {
 	getOffers,
 	getOffer,
@@ -212,4 +239,5 @@ module.exports = {
 	createOffer,
 	deleteOffer,
 	getOffersOfUser,
+	updateDate,
 };

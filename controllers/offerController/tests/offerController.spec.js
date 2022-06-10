@@ -90,9 +90,7 @@ describe("offer controller test", () => {
 		allUsers.forEach(async (user) => {
 			try {
 				await user.save();
-				console.log("succesfully saved user!");
 			} catch (err) {
-				console.log("error when saving user: " + user + "!");
 			} finally {
 				return;
 			}
@@ -108,7 +106,6 @@ describe("offer controller test", () => {
 	});
 	after(async () => {
 		await mongoConfigTesting.endMongoConnection();
-		console.log("connection closed");
 	});
 
 	describe("get offer test", () => {
@@ -123,8 +120,6 @@ describe("offer controller test", () => {
 					} else {
 						var data = JSON.parse(response["text"]);
 						expectDataToEqual(data, allOffers);
-
-						console.log(JSON.stringify(data));
 
 						expect(data[0]["user"]["username"]).to.eql("bob3");
 						expect(data[0]["user"]["password"]).to.not.be.ok;

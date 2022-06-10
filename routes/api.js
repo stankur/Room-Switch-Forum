@@ -46,6 +46,11 @@ router.post(
 	EnsureOfferUserIsSelf,
 	offerController.createOffer
 );
+router.post(
+	"/offers/:id/date",
+	passport.authenticate("jwt", { session: false }),
+	offerController.updateDate
+);
 
 router.delete(
 	"/offers/:id",

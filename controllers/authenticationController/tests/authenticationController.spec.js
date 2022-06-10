@@ -82,7 +82,6 @@ describe("authentication controller test", () => {
 
 	after(async () => {
 		await mongoConfigTesting.endMongoConnection();
-		console.log("connection closed");
 	});
 
 	describe("check existence test", () => {
@@ -206,7 +205,6 @@ describe("authentication controller test", () => {
 					} else {
 						var data = JSON.parse(response["text"]);
 
-						console.log(data["token"]);
 						expect(data["token"]).to.exist;
 						done();
 					}

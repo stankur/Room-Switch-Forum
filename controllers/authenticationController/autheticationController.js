@@ -31,11 +31,6 @@ var createNewUser = (req, res, next) => {
 	var username = req.body.username;
 	var password = req.body.password;
 
-	console.log("received body: " + JSON.stringify(req.body));
-
-	console.log("received username: " + username);
-	console.log("received password: " + password);
-
 	if (password.length < 8) {
 		return next(new Error("password length must be at least 8"));
 	}
@@ -90,8 +85,6 @@ var logIn = (req, res, next) => {
 	var username = req.body.username;
 	var password = req.body.password;
 
-	console.log("received username: " + username);
-	console.log("received password: " + password);
 
 	User.findOne({ username: username })
 		.lean()
