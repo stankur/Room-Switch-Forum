@@ -16,45 +16,44 @@ var createFuturePost = (req, res, next) => {
 		return next(err);
 	}
 
-	var title = req.body.title;
-	var body = req.body.body;
-
-	var nextPost = generateNextPost(req.body.nextPost);
-
-	var hourInterval = req.body.hourInterval;
 	var user = req.params.id;
 
-	var newFuturePost;
+	FuturePost.findOneAndUpdate(
+		{ user },
+		(() => {
+			var nextPost = generateNextPost(req.body.nextPost);
 
-	console.log("next post: " + nextPost);
+			var title = req.body.title;
+			var body = req.body.body;
 
-	if (nextPost) {
-		newFuturePost = new FuturePost({
-			title,
-			body,
-			nextPost,
-			hourInterval,
-			user,
-		});
-	} else {
-		newFuturePost = new FuturePost({
-			title,
-			body,
-			hourInterval,
-			user,
-		});
-	}
+			var hourInterval = req.body.hourInterval;
 
-	console.log(
-		"next post after handled by mongoose: " + newFuturePost.nextPost
-	);
-	newFuturePost.save((err, newPost) => {
-		if (err) {
-			return next(err);
+			if (nextPost) {
+				return {
+					title,
+					body,
+					nextPost,
+					hourInterval,
+					user,
+				};
+			} else {
+				return {
+					title,
+					body,
+					hourInterval,
+					user,
+				};
+			}
+		})(),
+		{ upsert: true, returnOriginal: false },
+		(err, newPost) => {
+			if (err) {
+				return next(err);
+			}
+
+			return res.json(newPost.toObject());
 		}
-
-		return res.json(newPost.toObject());
-	});
+	);
 };
 
 module.exports = {

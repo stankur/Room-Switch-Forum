@@ -2,7 +2,6 @@ var mongoose = require("mongoose");
 const { expect } = require("chai");
 
 var futurePostController = require("../futurePostController");
-var FuturePost = require("../../../models/FuturePost");
 var mongoConfigTesting = require("../../../../mongoConfigTesting");
 var testData = require("./testData");
 
@@ -49,7 +48,7 @@ describe("future post controller test", () => {
 		await mongoConfigTesting.endMongoConnection();
 	});
 
-	describe("create offer test", () => {
+	describe("update future post test", () => {
 		describe("next post time cases test", () => {
 			it("works when next post time is too early", (done) => {
 				request(app)
