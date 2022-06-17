@@ -8,16 +8,6 @@ var generateNextPost = (userDefinedNextPost) => {
 };
 
 var createFuturePost = (req, res, next) => {
-	try {
-		req.body.title;
-		req.body.body;
-		req.body.hourInterval;
-	} catch (err) {
-		return next(
-			new Error("one of title, body, or hour interval info is missing")
-		);
-	}
-
 	var user = req.params.id;
 
 	FuturePost.findOneAndUpdate(
@@ -29,6 +19,15 @@ var createFuturePost = (req, res, next) => {
 			var hourInterval;
 
 			try {
+				if (
+					!req.body.title ||
+					!req.body.body ||
+					!req.body.hourInterval
+				) {
+					throw new Error(
+						"one of the title, body, or hour interval is missing"
+					);
+				}
 				title = req.body.title;
 				body = req.body.body;
 				hourInterval = req.body.hourInterval;
