@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var MuutAccountSchema = new Schema({
 	username: {
 		type: String,
-		default: "RoomSwitchButler",
+		default: "testeruser",
 	},
 	password: {
 		type: String,

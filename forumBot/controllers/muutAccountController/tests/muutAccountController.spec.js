@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/users/:id/muut-account", muutAccountController.updateMuutAccount);
-app.get("/users/:id/muut-account", muutAccountController.findMuutAccount);
+app.get("/users/:id/muut-account", muutAccountController.getMuutAccount);
 
 app.use(function (err, req, res, next) {
 	res.status(err.status || 500);

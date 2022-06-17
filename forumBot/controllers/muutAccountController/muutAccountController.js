@@ -10,7 +10,7 @@ var updateMuutAccount = (req, res, next) => {
 		username = req.body.username;
 		password = req.body.password;
 	} else {
-		username = "RoomSwitchButler";
+		username = "testeruser";
 		password = process.env.BOT_PASSWORD;
 	}
 
@@ -36,14 +36,14 @@ var updateMuutAccount = (req, res, next) => {
 var findMuutAccount = (req, res, next) => {
 	var userId = req.params.id;
 
-	MuutAccount.find({ user: userId })
+	return MuutAccount.find({ user: userId }, "-password")
 		.lean()
 		.exec((err, foundMuutAccount) => {
 			if (err) {
 				return next(err);
 			}
 
-			if (!foundMuutAccount) {
+			if (foundMuutAccount.length === 0) {
 				return next(
 					new Error(
 						"the user with given user id doesn't have a registered muut account"
@@ -59,8 +59,16 @@ var findMuutAccount = (req, res, next) => {
 				);
 			}
 
-			return res.json(foundMuutAccount[0]);
+			req.muutAccount = foundMuutAccount[0];
+
+			return next();
 		});
 };
 
-module.exports = { updateMuutAccount, findMuutAccount };
+var sendMuutAccount = (req, res, next) => {
+	return res.json(req.muutAccount);
+};
+
+var getMuutAccount = [findMuutAccount, sendMuutAccount];
+
+module.exports = { updateMuutAccount, findMuutAccount, getMuutAccount };

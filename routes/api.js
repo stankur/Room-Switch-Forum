@@ -5,22 +5,7 @@ var passport = require("passport");
 
 var residencesModule = require("../staticInformation/residences");
 var offerController = require("../controllers/offerController/offerController");
-
-var EnsureParamsUserIsSelf = (req, res, next) => {
-	try {
-		if (req.params.id === req.user._id.toString()) {
-			return next();
-		}
-
-		return next(
-			new Error(
-				"user in the request params does not match with requester"
-			)
-		);
-	} catch (err) {
-		return next(err);
-	}
-};
+var forumBotRouter = require("../forumBot/routes/forumBot");
 
 var EnsureOfferUserIsSelf = (req, res, next) => {
 	try {
@@ -63,5 +48,10 @@ router.get("/residences", (res, req, next) => {
 });
 
 router.get("/users/:id/offers", offerController.getOffersOfUser);
+router.use(
+	"/forum-bot",
+	passport.authenticate("jwt", { session: false }),
+	forumBotRouter
+);
 
 module.exports = router;
