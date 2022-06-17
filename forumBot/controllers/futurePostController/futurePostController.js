@@ -13,7 +13,9 @@ var createFuturePost = (req, res, next) => {
 		req.body.body;
 		req.body.hourInterval;
 	} catch (err) {
-		return next(err);
+		return next(
+			new Error("one of title, body, or hour interval info is missing")
+		);
 	}
 
 	var user = req.params.id;
@@ -22,11 +24,17 @@ var createFuturePost = (req, res, next) => {
 		{ user },
 		(() => {
 			var nextPost = generateNextPost(req.body.nextPost);
+			var title;
+			var body;
+			var hourInterval;
 
-			var title = req.body.title;
-			var body = req.body.body;
-
-			var hourInterval = req.body.hourInterval;
+			try {
+				title = req.body.title;
+				body = req.body.body;
+				hourInterval = req.body.hourInterval;
+			} catch (err) {
+				return next(err);
+			}
 
 			if (nextPost) {
 				return {

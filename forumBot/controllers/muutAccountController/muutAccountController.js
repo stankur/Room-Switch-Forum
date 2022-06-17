@@ -29,7 +29,7 @@ var updateMuutAccount = (req, res, next) => {
 				return next(err);
 			}
 
-			//this is so that if the user uses our default account in the forum,
+			// this is so that if the user uses our default account in the forum,
 			// our password don't get exposed
 			delete doc["password"];
 
