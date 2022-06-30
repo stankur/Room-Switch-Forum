@@ -7,6 +7,26 @@ var generateNextPost = (userDefinedNextPost) => {
 	}
 };
 
+var getFuturePost = (req, res, next) => {
+	var user = req.params.id;
+
+	FuturePost.findOne({ user })
+		.lean()
+		.exec((err, foundFuturePost) => {
+			if (err) {
+				return next(err);
+			}
+
+			if (!foundFuturePost) {
+				return next(
+					new Error("no future post found for the given user")
+				);
+			}
+
+			return res.json(foundFuturePost);
+		});
+};
+
 var createFuturePost = (req, res, next) => {
 	var user = req.params.id;
 
@@ -65,4 +85,5 @@ var createFuturePost = (req, res, next) => {
 
 module.exports = {
 	createFuturePost,
+    getFuturePost
 };

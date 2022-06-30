@@ -27,10 +27,17 @@ router.get("/users/:id/muut-account", [
 	EnsureParamsUserIsSelf,
 	muutAccountController.getMuutAccount,
 ]);
+
 router.post("/users/:id/muut-account", [
 	EnsureParamsUserIsSelf,
 	muutAccountController.updateMuutAccount,
 ]);
+
+router.get("/users/:id/future-posts", [
+	EnsureParamsUserIsSelf,
+	futurePostController.getFuturePost,
+]);
+
 router.post("/users/:id/future-posts", [
 	EnsureParamsUserIsSelf,
 	muutAccountController.findMuutAccount,
